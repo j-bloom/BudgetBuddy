@@ -1,5 +1,9 @@
 # Budget Buddy v1.0
 
+## How to run this application
+- Clone this repo into a directory/folder of your choosing. Preferably somewhere easy to access.
+- Double-click or run the "BudgetBuddy.jar" file. This will execute the application.
+- If you wish to modify the app for yourself, after cloning the repo import the project into your Java editor of choice. 
 
 ## What does this app do?
 This is a budgeting application that allows users to enter their spending in several ways.  
