@@ -12,7 +12,7 @@ public class OCRImageText {
 		
 	    try {
 	    	//path of the tess data folder
-	    	tesseract.setDatapath("D:\\Projects\\Tess4J-3.4.8-src\\Tess4J\\tessdata");
+	    	tesseract.setDatapath("D:\\Projects\\Tess4J\\tessdata");
 	    	
 	        // Perform OCR on the image
 	        result = tesseract.doOCR(file);
