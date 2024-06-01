@@ -5,6 +5,9 @@
 - Double-click or run the "BudgetBuddy.jar" file. This will execute the application.
 - If you wish to modify the app for yourself, after cloning the repo import the project into your Java editor of choice. 
 
+## Application Demo
+[Link to Demo](https://youtu.be/X3RuMC_Q3DI)
+
 ## What does this app do?
 This is a budgeting application that allows users to enter their spending in several ways.  
 
