@@ -24,7 +24,8 @@ This is a budgeting application that allows users to enter their spending in sev
 
 - Importing a screenshot of the budget
   - If a user has created an entry on a mobile device, they can send it to themselves and import that screenshot  
-![BudgetBuddy ScreenShot Merge Page](https://github.com/j-bloom/BudgetBuddy/assets/36741471/618367fa-7bf8-427a-a9f0-e9b0493320dc)
+![BudgetBuddy ScreenShot Import Screenshot](https://github.com/j-bloom/BudgetBuddy/assets/36741471/e9f5f47d-c0ff-4c08-bcb8-011adfcf498f)
+
 
 
 ## Why this app?
