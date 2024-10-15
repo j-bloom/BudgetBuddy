@@ -2,6 +2,7 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QLineEdit, QComboBox, QDateEdit, QTableWidget, QVBoxLayout, QHBoxLayout, QMessageBox, QTableWidgetItem
 from PyQt5.QtSql import QSqlDatabase, QSqlQuery
+from PyQt5.QtCore import QDate
 
 # App Class
 class BudgetBuddyApp(QWidget):
@@ -17,10 +18,13 @@ class BudgetBuddyApp(QWidget):
 
         self.add_button = QPushButton("Add Entry")
         self.delete_button = QPushButton("Delete Entry")
+        self.add_button.clicked.connect(self.add_entry)
 
         self.table = QTableWidget()
         self.table.setColumnCount(4)
         self.table.setHorizontalHeaderLabels(["Date", "Category", "Amount", "Description"])
+
+        self.dropdown.addItems(["Food", "Groceries", "Transportation", "Entertainment", "Utilities", "Health", "Rent", "Other"])
 
         self.master_layout = QVBoxLayout()
         self.row1 = QHBoxLayout()
@@ -75,6 +79,30 @@ class BudgetBuddyApp(QWidget):
             self.table.setItem(row, 3, QTableWidgetItem(description))
 
             row += 1
+
+    def add_entry(self):
+        date = self.date_box.date().toString("yyyy-MM-dd")
+        category = self.dropdown.currentText()
+        amount = self.amount.text()
+        description = self.description.text()
+
+        query = QSqlQuery()
+        query.prepare("""INSERT INTO entries (date, category, amount, description) 
+                            VALUES (:date, :category, :amount, :description)
+                        """)
+        
+        query.bindValue(":date", date)
+        query.bindValue(":category", category)
+        query.bindValue(":amount", amount)
+        query.bindValue(":description", description)
+        query.exec_()
+
+        self.date_box.setDate(QDate.currentDate())
+        self.dropdown.setCurrentIndex(0)
+        self.amount.clear()
+        self.description.clear()
+
+        self.load_table()
 
 
 # Create the database 
