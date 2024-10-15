@@ -1,7 +1,9 @@
-#Import Modules
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QLineEdit, QComboBox, QDateEdit, QTableWidget, QVBoxLayout, QHBoxLayout
+# Import Modules
+import sys
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QLineEdit, QComboBox, QDateEdit, QTableWidget, QVBoxLayout, QHBoxLayout, QMessageBox, QTableWidgetItem
+from PyQt5.QtSql import QSqlDatabase, QSqlQuery
 
-#App Class
+# App Class
 class BudgetBuddyApp(QWidget):
     def __init__(self):
         super().__init__()
@@ -46,6 +48,55 @@ class BudgetBuddyApp(QWidget):
 
         self.setLayout(self.master_layout)
 
+        self.load_table()
+
+
+
+    def load_table(self):
+        self.table.setRowCount(0)
+        
+        query = QSqlQuery("SELECT * FROM entries ORDER BY date DESC")
+        row = 0
+        while query.next():
+            date = query.value(1)
+            # .toDate().toString("yyyy-MM-dd")
+            category = query.value(2)
+            # .toString()
+            amount = query.value(3)
+            # .toFloat()[0]
+            description = query.value(4)
+            # .toString()
+
+            self.table.insertRow(row)
+
+            self.table.setItem(row, 0, QTableWidgetItem(date))
+            self.table.setItem(row, 1, QTableWidgetItem(category))
+            self.table.setItem(row, 2, QTableWidgetItem(str(amount)))
+            self.table.setItem(row, 3, QTableWidgetItem(description))
+
+            row += 1
+
+
+# Create the database 
+database = QSqlDatabase.addDatabase("QSQLITE")
+database.setDatabaseName("budget.db")
+
+if not database.open():
+    QMessageBox.critical(None, "Error", "Could not connect to your database")
+    sys.exit(1)
+
+# Create the table if it doesn't exist
+query = QSqlQuery()
+query.exec_("""CREATE TABLE IF NOT EXISTS entries (
+                id INTEGER PRIMARY KEY AUTOINCREMENT, 
+                date DATE,
+                category TEXT,
+                amount REAL,
+                description TEXT
+            )
+            """)
+
+# Run the app
 if __name__ in "__main__":
     app = QApplication([])
     window = BudgetBuddyApp()
