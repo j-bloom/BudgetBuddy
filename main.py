@@ -19,6 +19,7 @@ class BudgetBuddyApp(QWidget):
         self.add_button = QPushButton("Add Entry")
         self.delete_button = QPushButton("Delete Entry")
         self.add_button.clicked.connect(self.add_entry)
+        self.delete_button.clicked.connect(self.delete_entry)
 
         self.table = QTableWidget()
         self.table.setColumnCount(4)
@@ -62,21 +63,19 @@ class BudgetBuddyApp(QWidget):
         query = QSqlQuery("SELECT * FROM entries ORDER BY date DESC")
         row = 0
         while query.next():
+            entry_id = query.value(0)
             date = query.value(1)
-            # .toDate().toString("yyyy-MM-dd")
             category = query.value(2)
-            # .toString()
             amount = query.value(3)
-            # .toFloat()[0]
             description = query.value(4)
-            # .toString()
 
             self.table.insertRow(row)
 
-            self.table.setItem(row, 0, QTableWidgetItem(date))
-            self.table.setItem(row, 1, QTableWidgetItem(category))
-            self.table.setItem(row, 2, QTableWidgetItem(str(amount)))
-            self.table.setItem(row, 3, QTableWidgetItem(description))
+            self.table.setItem(row, 0, QTableWidgetItem(str(entry_id))) 
+            self.table.setItem(row, 1, QTableWidgetItem(date))
+            self.table.setItem(row, 2, QTableWidgetItem(category))
+            self.table.setItem(row, 3, QTableWidgetItem(str(amount)))
+            self.table.setItem(row, 4, QTableWidgetItem(description))
 
             row += 1
 
@@ -103,6 +102,29 @@ class BudgetBuddyApp(QWidget):
         self.description.clear()
 
         self.load_table()
+
+    def delete_entry(self):
+        selected_row = self.table.currentRow()
+        if selected_row < 0:
+            QMessageBox.warning(None, "No Entry Chosen", "Please select an entry to delete!")
+            return
+        
+        entry_id = self.table.item(selected_row, 0).text()
+
+        confirm = QMessageBox.question(self, "Delete Entry", "Are you sure you want to delete this entry?", QMessageBox.Yes | QMessageBox.No)
+        
+        if confirm == QMessageBox.No:
+            return
+        
+        query = QSqlQuery()
+        query.prepare("DELETE FROM entries WHERE id = :entry_id")
+        query.bindValue(":entry_id", entry_id)
+        query.exec_()
+        
+        if not query.exec_():  # Check if the query executed successfully
+            QMessageBox.warning(self, "Error", "Failed to delete entry: " + query.lastError().text())
+        else:
+            self.load_table()
 
 
 # Create the database 
