@@ -1,4 +1,5 @@
 # Import Modules
+import datetime
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QLineEdit, QComboBox, QDateEdit, QTableWidget, QVBoxLayout, QHBoxLayout, QMessageBox, QTableWidgetItem
 from PyQt5.QtSql import QSqlDatabase, QSqlQuery
@@ -22,8 +23,8 @@ class BudgetBuddyApp(QWidget):
         self.delete_button.clicked.connect(self.delete_entry)
 
         self.table = QTableWidget()
-        self.table.setColumnCount(4)
-        self.table.setHorizontalHeaderLabels(["Date", "Category", "Amount", "Description"])
+        self.table.setColumnCount(5)
+        self.table.setHorizontalHeaderLabels(["Id", "Date", "Category", "Amount", "Description"])
 
         self.dropdown.addItems(["Food", "Groceries", "Transportation", "Entertainment", "Utilities", "Health", "Rent", "Other"])
 
@@ -53,14 +54,20 @@ class BudgetBuddyApp(QWidget):
 
         self.setLayout(self.master_layout)
 
+        month = self.get_current_month_year()
+
+        self.create_table(month)
         self.load_table()
 
-
+    def get_current_month_year(self):
+        today = datetime.datetime.now()
+        current_month_year = today.strftime("%Y_%m")  # Format as "YYYY_MM"
+        return current_month_year
 
     def load_table(self):
         self.table.setRowCount(0)
-        
-        query = QSqlQuery("SELECT * FROM entries ORDER BY date DESC")
+        month = self.get_current_month_year()
+        query = QSqlQuery(f"SELECT * FROM '{month}' ORDER BY date DESC")
         row = 0
         while query.next():
             entry_id = query.value(0)
@@ -85,8 +92,9 @@ class BudgetBuddyApp(QWidget):
         amount = self.amount.text()
         description = self.description.text()
 
+        month = self.get_current_month_year()
         query = QSqlQuery()
-        query.prepare("""INSERT INTO entries (date, category, amount, description) 
+        query.prepare(f"""INSERT INTO '{month}' (date, category, amount, description) 
                             VALUES (:date, :category, :amount, :description)
                         """)
         
@@ -94,14 +102,16 @@ class BudgetBuddyApp(QWidget):
         query.bindValue(":category", category)
         query.bindValue(":amount", amount)
         query.bindValue(":description", description)
-        query.exec_()
-
-        self.date_box.setDate(QDate.currentDate())
-        self.dropdown.setCurrentIndex(0)
-        self.amount.clear()
-        self.description.clear()
-
-        self.load_table()
+        
+        if not query.exec_():
+            error = query.lastError().text()
+            QMessageBox.warning(self, "Add Entry Failed", f"Failed to add entry: {error}")
+        else:
+            self.date_box.setDate(QDate.currentDate())
+            self.dropdown.setCurrentIndex(0)
+            self.amount.clear()
+            self.description.clear()
+            self.load_table()
 
     def delete_entry(self):
         selected_row = self.table.currentRow()
@@ -116,8 +126,10 @@ class BudgetBuddyApp(QWidget):
         if confirm == QMessageBox.No:
             return
         
+        month = self.get_current_month_year()
+
         query = QSqlQuery()
-        query.prepare("DELETE FROM entries WHERE id = :entry_id")
+        query.prepare(f"DELETE FROM '{month}' WHERE id = :entry_id")
         query.bindValue(":entry_id", entry_id)
         query.exec_()
         
@@ -125,6 +137,21 @@ class BudgetBuddyApp(QWidget):
             QMessageBox.warning(self, "Error", "Failed to delete entry: " + query.lastError().text())
         else:
             self.load_table()
+
+    def create_table(self, month):
+        # month = self.get_current_month_year()
+        # print(f"{month}")
+        # Create the table if it doesn't exist
+        query = QSqlQuery()
+        # print(f"{month}")
+        query.exec_(f"""CREATE TABLE IF NOT EXISTS '{month}' (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT, 
+                        date DATE,
+                        category TEXT,
+                        amount REAL,
+                        description TEXT
+                    )
+                    """)
 
 
 # Create the database 
@@ -134,17 +161,6 @@ database.setDatabaseName("budget.db")
 if not database.open():
     QMessageBox.critical(None, "Error", "Could not connect to your database")
     sys.exit(1)
-
-# Create the table if it doesn't exist
-query = QSqlQuery()
-query.exec_("""CREATE TABLE IF NOT EXISTS entries (
-                id INTEGER PRIMARY KEY AUTOINCREMENT, 
-                date DATE,
-                category TEXT,
-                amount REAL,
-                description TEXT
-            )
-            """)
 
 # Run the app
 if __name__ in "__main__":
