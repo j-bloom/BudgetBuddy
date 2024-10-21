@@ -2,6 +2,7 @@
 Import necessary modules to build the GUI
 and run the application
 """
+import datetime
 import sys
 from PyQt5.uic import loadUi
 from PyQt5 import QtWidgets
@@ -20,6 +21,9 @@ class WelcomeScreen(QDialog):
         self.addExpenseView.clicked.connect(self.navigate_to_expense_view)
         self.addIncomeView.clicked.connect(self.navigate_to_income_view)
 
+        month = self.get_current_month_year()
+        self.create_table(month)
+
     def navigate_to_expense_view(self):
         expense = Expense()
         widget.addWidget(expense)
@@ -29,6 +33,31 @@ class WelcomeScreen(QDialog):
         income = Income()
         widget.addWidget(income)
         widget.setCurrentWidget(income)
+
+    """
+    Create the table if it doesn't exist
+    """
+    def create_table(self, month):
+        query = QSqlQuery()
+        query.exec_(f"""CREATE TABLE IF NOT EXISTS '{month}' (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT, 
+                        date DATE,
+                        category TEXT,
+                        amount REAL,
+                        description TEXT,
+                        entry_type TEXT DEFAULT 'expense'
+                    )
+                    """)
+        
+
+    """
+    Get current month and year for table creation formated as "YYYY_MM"
+    """
+    def get_current_month_year(self):
+        today = datetime.datetime.now()
+        current_month_year = today.strftime("%Y_%m")
+        return current_month_year
+
 
 
 """
