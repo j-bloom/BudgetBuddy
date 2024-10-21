@@ -5,7 +5,9 @@ and run the application
 import sys
 from PyQt5.uic import loadUi
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QDialog, QApplication, QWidget
+from PyQt5.QtWidgets import QDialog, QApplication, QWidget, QMessageBox
+from PyQt5.QtSql import QSqlDatabase, QSqlQuery
+import os
 
 """
 Main class
@@ -13,7 +15,8 @@ Main class
 class WelcomeScreen(QDialog):
     def __init__(self):
         super().__init__()
-        loadUi('welcomescreen.ui', self)
+        ui_path = os.path.join('ui', 'welcomescreen.ui')
+        loadUi(ui_path, self)
         self.addExpenseView.clicked.connect(self.navigate_to_expense_view)
         self.addIncomeView.clicked.connect(self.navigate_to_income_view)
 
@@ -34,7 +37,8 @@ Expense class
 class Expense(QDialog):
     def __init__(self):
         super().__init__()
-        loadUi('expensescreen.ui', self)
+        ui_path = os.path.join('ui', 'expensescreen.ui')
+        loadUi(ui_path, self)
         self.monthlyView.clicked.connect(self.navigate_to_monthly_view)
         self.addIncomeView.clicked.connect(self.navigate_to_income_view)
 
@@ -55,7 +59,8 @@ Income class
 class Income(QDialog):
     def __init__(self):
         super().__init__()
-        loadUi('incomescreen.ui', self)
+        ui_path = os.path.join('ui', 'incomescreen.ui')
+        loadUi(ui_path, self)
         self.monthlyView.clicked.connect(self.navigate_to_monthly_view)
         self.addExpenseView.clicked.connect(self.navigate_to_expense_view)
 
@@ -69,6 +74,17 @@ class Income(QDialog):
         expense = Expense()
         widget.addWidget(expense)
         widget.setCurrentWidget(expense)
+
+
+"""
+Create the database 
+"""
+database = QSqlDatabase.addDatabase("QSQLITE")
+database.setDatabaseName("budget.db")
+
+if not database.open():
+    QMessageBox.critical(None, "Error", "Could not connect to your database")
+    sys.exit(1)
 
 
 """
