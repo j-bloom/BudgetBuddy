@@ -6,8 +6,9 @@ import datetime
 import sys
 from PyQt5.uic import loadUi
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QDialog, QApplication, QWidget, QMessageBox
+from PyQt5.QtWidgets import QDialog, QApplication, QWidget, QMessageBox, QTableWidget, QTableWidgetItem
 from PyQt5.QtSql import QSqlDatabase, QSqlQuery
+from PyQt5.QtCore import QDate
 import os
 
 """
@@ -43,9 +44,9 @@ class WelcomeScreen(QDialog):
                         id INTEGER PRIMARY KEY AUTOINCREMENT, 
                         date DATE,
                         category TEXT,
+                        entry_type TEXT DEFAULT 'expense',
                         amount REAL,
-                        description TEXT,
-                        entry_type TEXT DEFAULT 'expense'
+                        description TEXT
                     )
                     """)
         
@@ -57,7 +58,40 @@ class WelcomeScreen(QDialog):
         today = datetime.datetime.now()
         current_month_year = today.strftime("%Y_%m")
         return current_month_year
+    
+    """
+    Load table with entries from SQL database
+    """
+    def load_table(self):
+        self.table.setRowCount(0)
+        month = self.get_current_month_year()
+        query = QSqlQuery(f"SELECT * FROM '{month}' ORDER BY date DESC")
+        row = 0
+        while query.next():
+            entry_id = query.value(0)
+            date = query.value(1)
+            category = query.value(2)
+            entry_type = query.value(3)
+            amount = query.value(4)
+            description = query.value(5)
 
+            self.table.insertRow(row)
+
+            self.table.setItem(row, 0, QTableWidgetItem(str(entry_id))) 
+            self.table.setItem(row, 1, QTableWidgetItem(date))
+            self.table.setItem(row, 2, QTableWidgetItem(category))
+            self.table.setItem(row, 3, QTableWidgetItem(entry_type))
+            self.table.setItem(row, 4, QTableWidgetItem(str(amount)))
+            self.table.setItem(row, 5, QTableWidgetItem(description))
+
+            row += 1
+
+        """
+        Setup table structure for displaying entries
+        """
+        self.table = QTableWidget()
+        self.table.setColumnCount(6)
+        self.table.setHorizontalHeaderLabels(["Id", "Date", "Category", "Entry Type", "Amount", "Description"])
 
 
 """
@@ -71,6 +105,16 @@ class Expense(QDialog):
         self.monthlyView.clicked.connect(self.navigate_to_monthly_view)
         self.addIncomeView.clicked.connect(self.navigate_to_income_view)
 
+        self.addExpense.clicked.connect(self.add_entry)
+        self.deleteExpense.clicked.connect(self.delete_entry)
+        
+        self.table = self.findChild(QTableWidget, "tableWidget")  # Update this with the actual name from the .ui file
+
+        self.table.setColumnCount(6)
+        self.table.setHorizontalHeaderLabels(["Id", "Date", "Category", "Entry Type", "Amount", "Description"])
+
+        self.load_table()
+
     def navigate_to_monthly_view(self):
         monthly_view = WelcomeScreen()
         widget.addWidget(monthly_view)
@@ -80,6 +124,102 @@ class Expense(QDialog):
         income = Income()
         widget.addWidget(income)
         widget.setCurrentWidget(income)
+
+    """
+    Get current month and year for table creation formated as "YYYY_MM"
+    """
+    def get_current_month_year(self):
+        today = datetime.datetime.now()
+        current_month_year = today.strftime("%Y_%m")
+        return current_month_year
+
+    """
+    Load table with entries from SQL database
+    """
+    def load_table(self):
+        self.table.setRowCount(0)
+        month = self.get_current_month_year()
+        query = QSqlQuery(f"SELECT * FROM '{month}' ORDER BY date DESC")
+        row = 0
+        while query.next():
+            entry_id = query.value(0)
+            date = query.value(1)
+            category = query.value(2)
+            entry_type = query.value(3)
+            amount = query.value(4)
+            description = query.value(5)
+
+            self.table.insertRow(row)
+
+            self.table.setItem(row, 0, QTableWidgetItem(str(entry_id))) 
+            self.table.setItem(row, 1, QTableWidgetItem(date))
+            self.table.setItem(row, 2, QTableWidgetItem(category))
+            self.table.setItem(row, 3, QTableWidgetItem(entry_type))
+            self.table.setItem(row, 4, QTableWidgetItem(str(amount)))
+            self.table.setItem(row, 5, QTableWidgetItem(description))
+
+            row += 1
+
+    """
+    Add new entry to SQL database from user input
+    """
+    def add_entry(self):
+        date = self.date_box.date().toString("yyyy-MM-dd")
+        category = self.dropdown.currentText()
+        entry_type = "expense"
+        amount = self.amount.text()
+        description = self.description.toPlainText()
+
+        month = self.get_current_month_year()
+        query = QSqlQuery()
+        query.prepare(f"""INSERT INTO '{month}' (date, category, entry_type, amount, description) 
+                            VALUES (:date, :category, :entry_type, :amount, :description)
+                        """)
+        
+        query.bindValue(":date", date)
+        query.bindValue(":category", category)
+        query.bindValue(":entry_type", entry_type)
+        query.bindValue(":amount", amount)
+        query.bindValue(":description", description)
+        
+        if not query.exec_():
+            error = query.lastError().text()
+            QMessageBox.warning(self, "Add Entry Failed", f"Failed to add entry: {error}")
+        else:
+            self.date_box.setDate(QDate.currentDate())
+            self.dropdown.setCurrentIndex(0)
+            self.amount.clear()
+            self.description.clear()
+            self.load_table()
+
+    """
+    Delete selected entry from SQL database based on the entry id
+    """
+    def delete_entry(self):
+        selected_row = self.table.currentRow()
+        if selected_row < 0:
+            QMessageBox.warning(None, "No Entry Chosen", "Please select an entry to delete!")
+            return
+        
+        entry_id = self.table.item(selected_row, 0).text()
+
+        confirm = QMessageBox.question(self, "Delete Entry", "Are you sure you want to delete this entry?", QMessageBox.Yes | QMessageBox.No)
+        
+        if confirm == QMessageBox.No:
+            return
+        
+        month = self.get_current_month_year()
+
+        query = QSqlQuery()
+        query.prepare(f"DELETE FROM '{month}' WHERE id = :entry_id")
+        query.bindValue(":entry_id", entry_id)
+        
+        if not query.exec_():
+            QMessageBox.warning(self, "Error", "Failed to delete entry: " + query.lastError().text())
+        else:
+            self.load_table()
+
+        
 
 
 """
