@@ -11,7 +11,7 @@ class Income(QDialog):
         super().__init__()
         ui_path = os.path.join('ui', 'incomescreen.ui')
         loadUi(ui_path, self)
-
+        self.date_box.setDate(QDate.currentDate())
         self.stacked_widget = stacked_widget
 
         self.monthlyView.clicked.connect(self.navigate_to_monthly_view)
