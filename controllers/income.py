@@ -3,6 +3,7 @@ from PyQt5.uic import loadUi
 from PyQt5.QtWidgets import QDialog, QMessageBox, QTableWidget, QTableWidgetItem, QHeaderView
 from PyQt5.QtSql import QSqlQuery
 from PyQt5.QtCore import QDate
+import models
 import os
 
 class Income(QDialog):
@@ -84,17 +85,14 @@ class Income(QDialog):
         amount = self.amount.text()
         description = self.description.toPlainText()
 
+        transaction = models.Transaction(date, category, entry_type, amount, description)
+
         month = self.get_current_month_year()
         query = QSqlQuery()
         query.prepare(f"""INSERT INTO '{month}' (date, category, entry_type, amount, description) 
                             VALUES (:date, :category, :entry_type, :amount, :description)
                         """)
-        
-        query.bindValue(":date", date)
-        query.bindValue(":category", category)
-        query.bindValue(":entry_type", entry_type)
-        query.bindValue(":amount", amount)
-        query.bindValue(":description", description)
+        transaction.bind_to_query(query)
         
         if not query.exec_():
             error = query.lastError().text()
@@ -127,6 +125,8 @@ class Income(QDialog):
         if confirm == QMessageBox.No:
             return
 
+        transaction = models.Transaction(date, category, entry_type, amount, description)
+
         month = self.get_current_month_year()
 
         query = QSqlQuery()
@@ -135,13 +135,10 @@ class Income(QDialog):
                         category = :category AND 
                         entry_type = :entry_type AND 
                         amount = :amount AND 
-                        description = :description""")
+                        description = :description
+                      """)
 
-        query.bindValue(":date", date)
-        query.bindValue(":category", category)
-        query.bindValue(":entry_type", entry_type)
-        query.bindValue(":amount", amount)
-        query.bindValue(":description", description)
+        transaction.bind_to_query(query)
 
         if not query.exec_():
             QMessageBox.warning(self, "Error", "Failed to delete entry: " + query.lastError().text())
