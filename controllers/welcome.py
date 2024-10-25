@@ -1,4 +1,5 @@
 import datetime
+import sys
 from PyQt5.uic import loadUi
 from PyQt5.QtWidgets import QDialog, QTableWidget, QTableWidgetItem, QHeaderView, QFileDialog
 from PyQt5.QtSql import QSqlQuery
@@ -13,7 +14,11 @@ import os
 class WelcomeScreen(QDialog):
     def __init__(self, stacked_widget):
         super().__init__()
-        ui_path = os.path.join('ui', 'welcomescreen.ui')
+        if hasattr(sys, '_MEIPASS'):
+            ui_path = os.path.join(sys._MEIPASS, 'ui', 'welcomescreen.ui')
+        else:
+            ui_path = os.path.join('ui', 'welcomescreen.ui')
+
         loadUi(ui_path, self)
 
         self.stacked_widget = stacked_widget

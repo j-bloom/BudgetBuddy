@@ -1,4 +1,5 @@
 import datetime
+import sys
 from PyQt5.uic import loadUi
 from PyQt5.QtWidgets import QDialog, QMessageBox, QTableWidget, QTableWidgetItem, QHeaderView
 from PyQt5.QtSql import QSqlQuery
@@ -11,7 +12,11 @@ import os
 class Expense(QDialog):
     def __init__(self, stacked_widget):
         super().__init__()
-        ui_path = os.path.join('ui', 'expensescreen.ui')
+        if hasattr(sys, '_MEIPASS'):
+            ui_path = os.path.join(sys._MEIPASS, 'ui', 'expensescreen.ui')
+        else:
+            ui_path = os.path.join('ui', 'expensescreen.ui')
+
         loadUi(ui_path, self)
         self.date_box.setDate(QDate.currentDate())
         self.stacked_widget = stacked_widget
