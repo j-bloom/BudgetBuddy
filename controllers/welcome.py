@@ -2,6 +2,7 @@ import datetime
 from PyQt5.uic import loadUi
 from PyQt5.QtWidgets import QDialog, QTableWidget, QTableWidgetItem, QHeaderView
 from PyQt5.QtSql import QSqlQuery
+import controllers
 from controllers.expenses import Expense
 from controllers.income import Income
 import os
@@ -22,8 +23,8 @@ class WelcomeScreen(QDialog):
 
         self.table = self.findChild(QTableWidget, "tableWidget")  # Update this with the actual name from the .ui file
 
-        self.table.setColumnCount(5)
-        self.table.setHorizontalHeaderLabels(["Date", "Category", "Entry Type", "Amount", "Description"])
+        self.table.setColumnCount(6)
+        self.table.setHorizontalHeaderLabels(["Date", "Store Name", "Category", "Entry Type", "Amount", "Description"])
 
         header = self.table.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.Stretch)
@@ -47,7 +48,8 @@ class WelcomeScreen(QDialog):
         query = QSqlQuery()
         query.exec_(f"""CREATE TABLE IF NOT EXISTS '{month}' (
                         id INTEGER PRIMARY KEY AUTOINCREMENT, 
-                        date DATE,
+                        date DATE NOT NULL,
+                        store_name TEXT,
                         category TEXT,
                         entry_type TEXT DEFAULT 'expense',
                         amount REAL,
@@ -74,18 +76,20 @@ class WelcomeScreen(QDialog):
         row = 0
         while query.next():
             date = query.value(1)
-            category = query.value(2)
-            entry_type = query.value(3)
-            amount = query.value(4)
-            description = query.value(5)
+            store_name = query.value(2)
+            category = query.value(3)
+            entry_type = query.value(4)
+            amount = query.value(5)
+            description = query.value(6)
 
             self.table.insertRow(row)
 
             self.table.setItem(row, 0, QTableWidgetItem(date))
-            self.table.setItem(row, 1, QTableWidgetItem(category))
-            self.table.setItem(row, 2, QTableWidgetItem(entry_type))
-            self.table.setItem(row, 3, QTableWidgetItem(str(amount)))
-            self.table.setItem(row, 4, QTableWidgetItem(description))
+            self.table.setItem(row, 1, QTableWidgetItem(store_name))
+            self.table.setItem(row, 2, QTableWidgetItem(category))
+            self.table.setItem(row, 3, QTableWidgetItem(entry_type))
+            self.table.setItem(row, 4, QTableWidgetItem(str(amount)))
+            self.table.setItem(row, 5, QTableWidgetItem(description))
 
             row += 1
 
