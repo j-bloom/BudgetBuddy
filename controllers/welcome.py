@@ -88,3 +88,8 @@ class WelcomeScreen(QDialog):
             self.table.setItem(row, 4, QTableWidgetItem(description))
 
             row += 1
+
+        expenses = controllers.get_total_amounts(month, "expense")
+        self.total_expense.setText(f"$ {expenses}")
+        income = controllers.get_total_amounts(month, "income")
+        self.total_income.setText(f"$ {income}")

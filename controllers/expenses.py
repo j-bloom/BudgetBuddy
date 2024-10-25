@@ -75,6 +75,11 @@ class Expense(QDialog):
 
             row += 1
 
+        expenses = controllers.get_total_amounts(month, "expense")
+        self.total_expense.setText(f"$ {expenses}")
+        income = controllers.get_total_amounts(month, "income")
+        self.total_income.setText(f"$ {income}")
+
     """
     Add new entry to SQL database from user input
     """
