@@ -4,7 +4,9 @@ from PyQt5.QtWidgets import QDialog, QTableWidget, QTableWidgetItem, QHeaderView
 from PyQt5.QtSql import QSqlQuery
 import controllers
 from controllers.expenses import Expense
+import controllers.functions
 from controllers.income import Income
+from controllers.functions import *
 import os
 
 class WelcomeScreen(QDialog):
@@ -93,7 +95,7 @@ class WelcomeScreen(QDialog):
 
             row += 1
 
-        expenses = controllers.get_total_amounts(month, "expense")
+        expenses = controllers.functions.get_total_amounts(month, "expense")
         self.total_expense.setText(f"$ {expenses}")
-        income = controllers.get_total_amounts(month, "income")
+        income = controllers.functions.get_total_amounts(month, "income")
         self.total_income.setText(f"$ {income}")

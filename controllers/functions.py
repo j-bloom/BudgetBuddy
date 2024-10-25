@@ -19,9 +19,9 @@ def get_total_amounts(month, entry_type):
 
     # Move to the first row to retrieve the result
     if query.next():
-        total_income = query.value(0)
-        if total_income is None:  # Handle the case where there are no matching rows
-            total_income = 0.0
-        return float(total_income)
+        total = query.value(0)
+        if total is None or total =="":  # Handle the case where there are no matching rows
+            total = float(0.0)
+        return float(total)
     else:
-        return 0.0  # Return 0.0 if no results are returned
+        return float(0.0)  # Return 0.0 if no results are returned

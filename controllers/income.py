@@ -5,6 +5,7 @@ from PyQt5.QtSql import QSqlQuery
 from PyQt5.QtCore import QDate
 import models
 import controllers
+from controllers.functions import *
 import os
 
 class Income(QDialog):
@@ -78,9 +79,9 @@ class Income(QDialog):
 
             row += 1
 
-        expenses = controllers.get_total_amounts(month, "expense")
+        expenses = controllers.functions.get_total_amounts(month, "expense")
         self.total_expense.setText(f"$ {expenses}")
-        income = controllers.get_total_amounts(month, "income")
+        income = controllers.functions.get_total_amounts(month, "income")
         self.total_income.setText(f"$ {income}")
 
     """
