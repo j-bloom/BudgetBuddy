@@ -1,12 +1,13 @@
 import datetime
 from PyQt5.uic import loadUi
-from PyQt5.QtWidgets import QDialog, QTableWidget, QTableWidgetItem, QHeaderView
+from PyQt5.QtWidgets import QDialog, QTableWidget, QTableWidgetItem, QHeaderView, QFileDialog
 from PyQt5.QtSql import QSqlQuery
 import controllers
 from controllers.expenses import Expense
 import controllers.functions
 from controllers.income import Income
 from controllers.functions import *
+import csv
 import os
 
 class WelcomeScreen(QDialog):
@@ -30,6 +31,8 @@ class WelcomeScreen(QDialog):
 
         header = self.table.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.Stretch)
+
+        self.export_to_csv_btn.clicked.connect(self.export_to_csv)
 
         self.load_table()
 
@@ -99,3 +102,34 @@ class WelcomeScreen(QDialog):
         self.total_expense.setText(f"$ {expenses}")
         income = controllers.functions.get_total_amounts(month, "income")
         self.total_income.setText(f"$ {income}")
+
+
+
+
+    def export_to_csv(self):
+        # Open a file dialog to specify where to save the CSV
+        file_path, _ = QFileDialog.getSaveFileName(self, "Save CSV", "", "CSV files (*.csv);;All Files (*)")
+        
+        # Proceed only if the user selects a file
+        if file_path:
+            try:
+                # Open file in write mode
+                with open(file_path, mode='w', newline='') as file:
+                    writer = csv.writer(file)
+                    
+                    # Write headers from table
+                    headers = [self.table.horizontalHeaderItem(col).text() for col in range(self.table.columnCount())]
+                    writer.writerow(headers)
+                    
+                    # Write each row's data to the CSV file
+                    for row in range(self.table.rowCount()):
+                        row_data = [
+                            self.table.item(row, col).text() if self.table.item(row, col) is not None else ""
+                            for col in range(self.table.columnCount())
+                        ]
+                        writer.writerow(row_data)
+                
+                QMessageBox.information(self, "Export Successful", f"Data exported successfully to {file_path}")
+
+            except Exception as e:
+                QMessageBox.warning(self, "Export Failed", f"An error occurred while exporting: {e}")
