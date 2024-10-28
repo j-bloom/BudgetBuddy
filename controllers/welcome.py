@@ -8,6 +8,9 @@ from controllers.expenses import Expense
 import controllers.functions
 from controllers.income import Income
 from controllers.functions import *
+from PIL import Image
+import pytesseract
+import sys
 import csv
 import os
 
@@ -26,6 +29,10 @@ class WelcomeScreen(QDialog):
         self.addExpenseView.clicked.connect(self.navigate_to_expense_view)
         self.addIncomeView.clicked.connect(self.navigate_to_income_view)
 
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        tesseract_path = os.path.join(script_dir, 'Tesseract-OCR', 'tesseract.exe')
+        pytesseract.pytesseract.tesseract_cmd = tesseract_path
+
         month = self.get_current_month_year()
         self.create_table(month)
 
@@ -38,6 +45,8 @@ class WelcomeScreen(QDialog):
         header.setSectionResizeMode(QHeaderView.Stretch)
 
         self.export_to_csv_btn.clicked.connect(self.export_to_csv)
+        self.import_from_csv_btn.clicked.connect(self.import_from_csv)
+        self.import_csv_image_btn.clicked.connect(self.import_csv_image)
 
         self.load_table()
 
@@ -188,3 +197,12 @@ class WelcomeScreen(QDialog):
         except Exception as e:
             QMessageBox.critical(self, "Import Failed", f"An error occurred while importing: {e}")
 
+    def import_csv_image(self):
+        pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'  # Adjust this path if needed
+        # Open a file dialog to select the image
+        file_path, _ = QFileDialog.getOpenFileName(self, "Select Image", "", "Image Files (*.png *.jpg *.jpeg *.bmp)")
+        
+        if file_path:
+            current_month = self.get_current_month_year()  # Get the current month/year for the table name
+            controllers.functions.process_ocr_and_insert(file_path, current_month)
+            self.load_table()  # Reload the table after inserting
