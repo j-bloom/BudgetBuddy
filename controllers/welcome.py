@@ -138,3 +138,53 @@ class WelcomeScreen(QDialog):
 
             except Exception as e:
                 QMessageBox.warning(self, "Export Failed", f"An error occurred while exporting: {e}")
+
+    def import_from_csv(self):
+        # Open a file dialog for selecting a CSV file
+        file_path, _ = QFileDialog.getOpenFileName(self, "Import CSV", "", "CSV files (*.csv);;All Files (*)")
+        
+        # Only proceed if a file was selected
+        if not file_path:
+            return
+
+        # Define the current month and year for the database table name
+        month = self.get_current_month_year()
+        
+        try:
+            with open(file_path, mode='r') as file:
+                reader = csv.reader(file)
+                
+                # Skip the header row if the CSV has headers
+                headers = next(reader, None)
+                
+                # Insert each row into the database
+                query = QSqlQuery()
+                for row in reader:
+                    date, store_name, category, entry_type, amount, description = row
+                    
+                    # Prepare SQL insert statement
+                    query.prepare(f"""
+                        INSERT INTO '{month}' (date, store_name, category, entry_type, amount, description) 
+                        VALUES (:date, :store_name, :category, :entry_type, :amount, :description)
+                    """)
+                    
+                    # Bind values to prevent SQL injection
+                    query.addBindValue(date)
+                    query.addBindValue(store_name)
+                    query.addBindValue(category)
+                    query.addBindValue(entry_type)
+                    query.addBindValue(float(amount))  # Convert amount to float
+                    query.addBindValue(description)
+                    
+                    # Execute the query and check for errors
+                    if not query.exec_():
+                        raise Exception(f"Error inserting row: {query.lastError().text()}")
+
+            QMessageBox.information(self, "Import Successful", f"Data imported successfully from {file_path}")
+
+            # Reload table to reflect new data
+            self.load_table()
+
+        except Exception as e:
+            QMessageBox.critical(self, "Import Failed", f"An error occurred while importing: {e}")
+
