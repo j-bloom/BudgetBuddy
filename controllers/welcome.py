@@ -2,6 +2,7 @@ import datetime
 from difflib import SequenceMatcher
 import sys
 from PyQt5.uic import loadUi
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog, QTableWidget, QTableWidgetItem, QHeaderView, QFileDialog
 from PyQt5.QtSql import QSqlQuery
 import controllers
@@ -44,6 +45,10 @@ class WelcomeScreen(QDialog):
 
         header = self.table.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.Stretch)
+        self.setup_column_sorting(header)  # Call the new method to enable sorting
+
+        # Dictionary to keep track of sorting order for each column
+        self.sort_order = {}
 
         self.export_to_csv_btn.clicked.connect(self.export_to_csv)
         self.import_from_csv_btn.clicked.connect(self.import_from_csv)
@@ -230,3 +235,22 @@ class WelcomeScreen(QDialog):
                     break
             
             self.table.setRowHidden(row, not row_match)
+
+
+    def setup_column_sorting(self, header):
+        self.table.setSortingEnabled(True)
+        header.setSortIndicatorShown(True)
+        header.setSectionsClickable(True)
+        header.sectionClicked.connect(self.sort_by_column)
+
+    def sort_by_column(self, column):
+        current_order = self.sort_order.get(column, Qt.AscendingOrder)
+        new_order = Qt.DescendingOrder if current_order == Qt.AscendingOrder else Qt.AscendingOrder
+
+        self.table.sortItems(column, new_order)
+
+        # Store the new order for future toggling
+        self.sort_order[column] = new_order
+
+        # Update the sort indicator to show the current order for the column
+        self.table.horizontalHeader().setSortIndicator(column, new_order)
