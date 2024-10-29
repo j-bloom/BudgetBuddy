@@ -2,10 +2,10 @@
 
 ## How to run this application
 - Clone this repo into a directory/folder of your choosing. Preferably somewhere easy to access, run it in your favorite IDE and run the python app.
-- You can also use teh link [here](https://drive.google.com/file/d/1M9LjkS-QLbDG0uuGtxd68iuGNVs61m9s/view?usp=drive_link) to access a Windows executable.
+- You can also use the link [here]([https://drive.google.com/file/d/1M9LjkS-QLbDG0uuGtxd68iuGNVs61m9s/view?usp=drive_link](https://drive.google.com/file/d/1mq85sGu0TQLGx-VoEKDfbaXUmsESClaO/view?usp=sharing)) to access a Windows executable.
   
 *Currently the only options to run this app are an exe for Windows and the code being run through an IDE.
-  - If you would like to run this app on Linux od Mac, a third party application such as Wine would be necessary.  
+  - If you would like to run this app on Linux or Mac, a third party application such as Wine would be necessary.  
 
 ## What does this app do?
 This is a budgeting application that allows users to enter their spending in several ways.  
