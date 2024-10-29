@@ -1,4 +1,5 @@
 import datetime
+from difflib import SequenceMatcher
 import sys
 from PyQt5.uic import loadUi
 from PyQt5.QtWidgets import QDialog, QTableWidget, QTableWidgetItem, QHeaderView, QFileDialog
@@ -47,6 +48,7 @@ class WelcomeScreen(QDialog):
         self.export_to_csv_btn.clicked.connect(self.export_to_csv)
         self.import_from_csv_btn.clicked.connect(self.import_from_csv)
         self.import_csv_image_btn.clicked.connect(self.import_csv_image)
+        self.search_box.textChanged.connect(self.filter_table)
 
         self.load_table()
 
@@ -206,3 +208,25 @@ class WelcomeScreen(QDialog):
             current_month = self.get_current_month_year()  # Get the current month/year for the table name
             controllers.functions.process_ocr_and_insert(file_path, current_month)
             self.load_table()  # Reload the table after inserting
+
+    def filter_table(self):
+        search_text = self.search_box.text().strip().lower()
+        
+        if not search_text:
+            # If search box is cleared, show all rows
+            for row in range(self.table.rowCount()):
+                self.table.setRowHidden(row, False)
+            return
+        
+        for row in range(self.table.rowCount()):
+            row_match = False
+            for col in range(self.table.columnCount()):
+                cell_text = self.table.item(row, col).text().lower() if self.table.item(row, col) else ""
+                
+                similarity = SequenceMatcher(None, search_text, cell_text).ratio()
+                
+                if search_text in cell_text or similarity > 0.7:
+                    row_match = True
+                    break
+            
+            self.table.setRowHidden(row, not row_match)
