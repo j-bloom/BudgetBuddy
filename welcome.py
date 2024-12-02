@@ -2,6 +2,8 @@ import datetime
 from PyQt5.uic import loadUi
 from PyQt5.QtWidgets import QDialog, QTableWidget, QHeaderView
 from database import Database
+from expenses import ExpenseDialog
+from income import IncomeDialog
 
 class MainWindow(QDialog):
     def __init__(self):
@@ -25,6 +27,12 @@ class MainWindow(QDialog):
         header = self.table.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.Stretch)
 
+        """
+        Connect the income/expense buttons to their respective views/dialogs
+        """
+        self.addExpenseBtn.clicked.connect(self.display_expense_dialog)
+        self.addIncomeBtn.clicked.connect(self.display_income_dialog)
+
         
     """
     Get current year and month for table creation formated as "YYYY_MM"
@@ -33,3 +41,11 @@ class MainWindow(QDialog):
         today = datetime.datetime.now()
         current_month_year = today.strftime("%Y_%m")
         return current_month_year
+    
+    def display_expense_dialog(self):
+        expense_dialog = ExpenseDialog()
+        expense_dialog.exec_()
+
+    def display_income_dialog(self):
+        income_dialog = IncomeDialog()
+        income_dialog.exec_()
