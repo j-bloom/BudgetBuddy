@@ -3,11 +3,10 @@ Import necessary modules to build the GUI
 and run the application
 """
 import sys
-from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QApplication, QMessageBox
+from welcome import MainWindow
 from PyQt5.QtSql import QSqlDatabase
-import controllers
-        
+
 """
 Create the database 
 """
@@ -19,19 +18,9 @@ if not database.open():
     sys.exit(1)
 
 
-"""
-Main function to run the application
-"""
-if __name__ == "__main__":
+# Create an instance of QApplication and run the application
+if __name__ == '__main__':
     app = QApplication(sys.argv)
-    widget = QtWidgets.QStackedWidget()
-
-    welcome = controllers.WelcomeScreen(widget)
-    widget.addWidget(welcome)
-    widget.setFixedHeight(800)
-    widget.setFixedWidth(1300)
-    widget.show()
-    try:
-        sys.exit(app.exec_())
-    except:
-        print("Error occurred while running the application.")
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec_())
