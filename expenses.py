@@ -13,7 +13,8 @@ class ExpenseDialog(QDialog):
         super(ExpenseDialog, self).__init__()
         loadUi('expenseDialog.ui', self)
         self.expenseAddPushButton.clicked.connect(self.add_entry)
-                                                  
+        self.expenseCancelPushButton.clicked.connect(self.close)
+    
     """
     Add new entry to SQL database from user input
     """
