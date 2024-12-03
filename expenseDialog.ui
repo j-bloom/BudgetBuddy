@@ -179,7 +179,7 @@ QPlainTextEdit::viewport {
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_6">
       <item>
-       <widget class="QLabel" name="expenseCategoryDrowdownLabel">
+       <widget class="QLabel" name="expenseCategoryDropdownLabel">
         <property name="font">
          <font>
           <pointsize>12</pointsize>
@@ -191,7 +191,7 @@ QPlainTextEdit::viewport {
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="expenseCategoryDrowdown">
+       <widget class="QComboBox" name="expenseCategoryDropdown">
         <property name="minimumSize">
          <size>
           <width>0</width>
