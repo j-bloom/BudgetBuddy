@@ -51,6 +51,7 @@ class MainWindow(QDialog):
 
     def display_income_dialog(self):
         income_dialog = IncomeDialog()
+        income_dialog.entry_added.connect(self.reload_table)
         income_dialog.exec_()
 
 
