@@ -20,19 +20,19 @@ class ExpenseDialog(QDialog):
     """
     def add_entry(self):
         date = self.expenseDateEdit.date().toString("yyyy-MM-dd")
-        store_name = self.expenseStoreEdit.text() 
+        source = self.expenseSourceEdit.text() 
         category = self.expenseCategoryDropdown.currentText()
         entry_type = "expense"
         amount = self.expenseAmountSpinbox.text()
         description = self.expenseDescriptionTextEdit.toPlainText()
         month = self.get_current_year_month()
         query = QSqlQuery()
-        query.prepare(f"""INSERT INTO '{month}' (date, store_name, category, entry_type, amount, description) 
-                            VALUES (:date, :store_name, :category, :entry_type, :amount, :description)
+        query.prepare(f"""INSERT INTO '{month}' (date, source, category, entry_type, amount, description) 
+                            VALUES (:date, :source, :category, :entry_type, :amount, :description)
                         """)
         
         query.bindValue(":date", date)
-        query.bindValue(":store_name", store_name)
+        query.bindValue(":source", source)
         query.bindValue(":category", category)
         query.bindValue(":entry_type", entry_type)
         query.bindValue(":amount", amount)
@@ -43,7 +43,7 @@ class ExpenseDialog(QDialog):
             QMessageBox.warning(self, "Add Entry Failed", f"Failed to add entry: {error}")
         else:
             self.expenseDateEdit.setDate(QDate.currentDate())
-            self.expenseStoreEdit.clear() 
+            self.expenseSourceEdit.clear() 
             self.expenseCategoryDropdown.setCurrentIndex(0)
             self.expenseAmountSpinbox.clear()
             self.expenseDescriptionTextEdit.clear()

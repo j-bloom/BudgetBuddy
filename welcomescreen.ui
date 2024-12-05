@@ -105,7 +105,7 @@ QLineEdit::viewport {
    </column>
    <column>
     <property name="text">
-     <string>Store</string>
+     <string>Source</string>
     </property>
     <property name="font">
      <font>
@@ -327,21 +327,21 @@ QLineEdit::viewport {
       <height>52</height>
      </rect>
     </property>
-    <layout class="QVBoxLayout" name="verticalLayout_Store">
+    <layout class="QVBoxLayout" name="verticalLayout_Source">
      <item>
-      <widget class="QLabel" name="storeSortLabel">
+      <widget class="QLabel" name="sourceSortLabel">
        <property name="font">
         <font>
          <pointsize>12</pointsize>
         </font>
        </property>
        <property name="text">
-        <string>Store</string>
+        <string>Source</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="storeSort">
+      <widget class="QComboBox" name="sourceSort">
        <property name="minimumSize">
         <size>
          <width>0</width>

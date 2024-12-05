@@ -10,7 +10,7 @@ class Database:
         query.exec_(f"""CREATE TABLE IF NOT EXISTS '{month}' (
                         id INTEGER PRIMARY KEY AUTOINCREMENT, 
                         date DATE NOT NULL,
-                        store_name TEXT,
+                        source TEXT,
                         category TEXT,
                         entry_type TEXT DEFAULT 'expense',
                         amount REAL,

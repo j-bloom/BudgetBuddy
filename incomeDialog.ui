@@ -180,19 +180,19 @@ QPlainTextEdit::viewport {
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_5">
       <item>
-       <widget class="QLabel" name="incomeStoreEditLabel">
+       <widget class="QLabel" name="incomeSourceEditLabel">
         <property name="font">
          <font>
           <pointsize>12</pointsize>
          </font>
         </property>
         <property name="text">
-         <string>Store</string>
+         <string>Source</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="incomeStoreEdit">
+       <widget class="QLineEdit" name="incomeSourceEdit">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
           <horstretch>0</horstretch>

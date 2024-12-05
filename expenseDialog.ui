@@ -153,7 +153,7 @@ QPlainTextEdit::viewport {
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_9">
       <item>
-       <widget class="QLabel" name="expenseStoreEditLabel">
+       <widget class="QLabel" name="expenseSourceEditLabel">
         <property name="font">
          <font>
           <pointsize>12</pointsize>
@@ -165,7 +165,7 @@ QPlainTextEdit::viewport {
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="expenseStoreEdit">
+       <widget class="QLineEdit" name="expenseSourceEdit">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
           <horstretch>0</horstretch>
