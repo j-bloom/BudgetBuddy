@@ -91,6 +91,11 @@ QPlainTextEdit::viewport {
      <height>31</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
    <property name="text">
     <string>Cancel</string>
    </property>
@@ -98,11 +103,16 @@ QPlainTextEdit::viewport {
   <widget class="QPushButton" name="incomeAddPushButton">
    <property name="geometry">
     <rect>
-     <x>300</x>
+     <x>274</x>
      <y>352</y>
-     <width>75</width>
+     <width>101</width>
      <height>31</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
    </property>
    <property name="text">
     <string>Add Income</string>
@@ -131,7 +141,13 @@ QPlainTextEdit::viewport {
      </widget>
     </item>
     <item>
-     <widget class="QPlainTextEdit" name="incomeDescriptionTextEdit"/>
+     <widget class="QPlainTextEdit" name="incomeDescriptionTextEdit">
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -173,6 +189,11 @@ QPlainTextEdit::viewport {
           <height>25</height>
          </size>
         </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
        </widget>
       </item>
      </layout>
@@ -198,6 +219,11 @@ QPlainTextEdit::viewport {
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
         </property>
        </widget>
       </item>
@@ -230,6 +256,11 @@ QPlainTextEdit::viewport {
           <width>16777215</width>
           <height>25</height>
          </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
         </property>
         <property name="placeholderText" stdset="0">
          <string>--Select Option--</string>
@@ -295,6 +326,11 @@ QPlainTextEdit::viewport {
           <width>16777215</width>
           <height>25</height>
          </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
         </property>
        </widget>
       </item>
