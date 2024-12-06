@@ -8,6 +8,9 @@ from expenses import ExpenseDialog
 from income import IncomeDialog
 from PyQt5.QtSql import QSqlQuery
 from fpdf import FPDF
+import pytesseract
+from PIL import Image
+import controllers.functions
 
 class MainWindow(QDialog):
     def __init__(self):
@@ -43,6 +46,7 @@ class MainWindow(QDialog):
         self.csvExportBtn.clicked.connect(self.export_to_csv)
         self.csvImportBtn.clicked.connect(self.import_from_csv)
         self.pdfExportBtn.clicked.connect(self.export_to_pdf)
+        self.screenshotImportBtn.clicked.connect(self.import_screenshot_image)
         self.searchFilterInput.textChanged.connect(self.filter_table)
         
         self.update_totals()
@@ -61,8 +65,8 @@ class MainWindow(QDialog):
     """
     def get_current_year_month(self):
         today = datetime.datetime.now()
-        current_month_year = today.strftime("%Y_%m")
-        return current_month_year
+        current_year_month = today.strftime("%Y_%m")
+        return current_year_month
     
     def display_expense_dialog(self):
         expense_dialog = ExpenseDialog()
@@ -281,3 +285,13 @@ class MainWindow(QDialog):
             QMessageBox.information(self, "Export Successful", f"Data exported successfully to {file_path}")
         except Exception as e:
             QMessageBox.warning(self, "Export Failed", f"Failed to export data to PDF: {str(e)}")
+
+    def import_screenshot_image(self):
+        pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'  # Adjust this path if needed
+        # Open a file dialog to select the image
+        file_path, _ = QFileDialog.getOpenFileName(self, "Select Image", "", "Image Files (*.png *.jpg *.jpeg *.bmp)")
+        
+        if file_path:
+            current_month = self.get_current_year_month()
+            controllers.functions.process_ocr_and_insert(file_path, current_month)
+            self.reload_table()
