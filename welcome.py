@@ -211,6 +211,8 @@ class MainWindow(QDialog):
                     # Execute the query and check for errors
                     if not query.exec_():
                         raise Exception(f"Error inserting row: {query.lastError().text()}")
+                    
+                    self.reload_table()
 
             QMessageBox.information(self, "Import Successful", f"Data imported successfully from {file_path}")
 
