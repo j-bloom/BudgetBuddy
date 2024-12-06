@@ -1,5 +1,6 @@
 import datetime
 import csv
+from difflib import SequenceMatcher
 from PyQt5.uic import loadUi
 from PyQt5.QtWidgets import QDialog, QTableWidget, QHeaderView, QTableWidgetItem, QMessageBox, QFileDialog
 from database import Database
@@ -40,6 +41,8 @@ class MainWindow(QDialog):
         """
         self.csvExportBtn.clicked.connect(self.export_to_csv)
         self.csvImportBtn.clicked.connect(self.import_from_csv)
+
+        self.searchFilterInput.textChanged.connect(self.filter_table)
         
         self.update_totals()
         self.load_table()
@@ -211,3 +214,25 @@ class MainWindow(QDialog):
 
         except Exception as e:
             QMessageBox.critical(self, "Import Failed", f"An error occurred while importing: {e}")
+
+    def filter_table(self):
+        search_text = self.searchFilterInput.text().strip().lower()
+        
+        if not search_text:
+            # If search box is cleared, show all rows
+            for row in range(self.table.rowCount()):
+                self.table.setRowHidden(row, False)
+            return
+        
+        for row in range(self.table.rowCount()):
+            row_match = False
+            for col in range(self.table.columnCount()):
+                cell_text = self.table.item(row, col).text().lower() if self.table.item(row, col) else ""
+                
+                similarity = SequenceMatcher(None, search_text, cell_text).ratio()
+                
+                if search_text in cell_text or similarity > 0.7:
+                    row_match = True
+                    break
+            
+            self.table.setRowHidden(row, not row_match)
