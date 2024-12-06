@@ -34,8 +34,17 @@ class MainWindow(QDialog):
         self.addExpenseBtn.clicked.connect(self.display_expense_dialog)
         self.addIncomeBtn.clicked.connect(self.display_income_dialog)
 
+        self.update_totals()
         self.load_table()
         
+
+    def update_totals(self):
+        month = self.get_current_year_month()
+        expenses = self.get_total_amounts(month, "expense")
+        self.totalExpensesAmount.setText(f"$ {expenses:.2f}")
+        income = self.get_total_amounts(month, "income")
+        self.totalIncomeAmount.setText(f"$ {income:.2f}")
+
     """
     Get current year and month for table creation formated as "YYYY_MM"
     """
@@ -85,4 +94,34 @@ class MainWindow(QDialog):
     def reload_table(self):
         self.table.clearContents()
         self.table.setRowCount(0)
+        self.update_totals()
         self.load_table()
+
+    
+    """
+    Fetch and display total amounts for income and expenses
+    """
+    def get_total_amounts(self, month, entry_type):
+        query = QSqlQuery()
+        
+        # Prepare and execute the SQL query to sum the amounts
+        query.prepare(f"""
+                    SELECT SUM(amount) 
+                    FROM '{month}' 
+                    WHERE entry_type = :entry_type
+                    """)
+        query.bindValue(":entry_type", entry_type)
+        
+        if not query.exec_():
+            error = query.lastError().text()
+            QMessageBox.warning(None, "Add Entry Failed", f"Failed to retrieve total amount: {error}")
+            return 0.0
+
+        # Move to the first row to retrieve the result
+        if query.next():
+            total = query.value(0)
+            if total is None or total =="":
+                total = float(0.0)
+            return float(total)
+        else:
+            return float(0.0)  
