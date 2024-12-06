@@ -12,6 +12,9 @@ class IncomeDialog(QDialog):
     def __init__(self):
         super(IncomeDialog, self).__init__()
         loadUi('incomeDialog.ui', self)
+
+        self.incomeDateEdit.setDate(QDate.currentDate())
+
         self.incomeAddPushButton.clicked.connect(self.add_entry)
         self.incomeCancelPushButton.clicked.connect(self.close)
     

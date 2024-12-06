@@ -12,6 +12,9 @@ class ExpenseDialog(QDialog):
     def __init__(self):
         super(ExpenseDialog, self).__init__()
         loadUi('expenseDialog.ui', self)
+
+        self.expenseDateEdit.setDate(QDate.currentDate())
+
         self.expenseAddPushButton.clicked.connect(self.add_entry)
         self.expenseCancelPushButton.clicked.connect(self.close)
     
