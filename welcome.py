@@ -7,6 +7,7 @@ from database import Database
 from expenses import ExpenseDialog
 from income import IncomeDialog
 from PyQt5.QtSql import QSqlQuery
+from fpdf import FPDF
 
 class MainWindow(QDialog):
     def __init__(self):
@@ -41,7 +42,7 @@ class MainWindow(QDialog):
         """
         self.csvExportBtn.clicked.connect(self.export_to_csv)
         self.csvImportBtn.clicked.connect(self.import_from_csv)
-
+        self.pdfExportBtn.clicked.connect(self.export_to_pdf)
         self.searchFilterInput.textChanged.connect(self.filter_table)
         
         self.update_totals()
@@ -236,3 +237,47 @@ class MainWindow(QDialog):
                     break
             
             self.table.setRowHidden(row, not row_match)
+
+
+    def export_to_pdf(self):
+        # Open file dialog to choose where to save the PDF
+        file_path, _ = QFileDialog.getSaveFileName(self, "Export to PDF", "", "PDF Files (*.pdf);;All Files (*)")
+        if not file_path:
+            return  # User canceled the dialog
+
+        # Create a PDF object
+        pdf = FPDF()
+        pdf.set_auto_page_break(auto=True, margin=15)
+        pdf.add_page()
+        pdf.set_font("Arial", size=12)
+
+        # Add title
+        pdf.set_font("Arial", style="B", size=14)
+        pdf.cell(200, 10, txt="Budget Buddy Report", ln=True, align="C")
+        pdf.ln(10)  # Add a line break
+
+        # Add table headers
+        headers = ["Date", "Source", "Category", "Entry Type", "Amount", "Description"]
+        column_widths = [30, 30, 30, 30, 20, 50]  # Customize column widths as needed
+
+        pdf.set_font("Arial", style="B", size=12)
+        for header, width in zip(headers, column_widths):
+            pdf.cell(width, 10, header, border=1, align="C")
+        pdf.ln()
+
+        # Add table data
+        pdf.set_font("Arial", size=10)
+        row_count = self.table.rowCount()
+        for row in range(row_count):
+            for col, width in enumerate(column_widths):
+                item = self.table.item(row, col)
+                cell_data = item.text() if item else ""
+                pdf.cell(width, 10, cell_data, border=1)
+            pdf.ln()
+
+        # Save the PDF to the chosen file path
+        try:
+            pdf.output(file_path)
+            QMessageBox.information(self, "Export Successful", f"Data exported successfully to {file_path}")
+        except Exception as e:
+            QMessageBox.warning(self, "Export Failed", f"Failed to export data to PDF: {str(e)}")
