@@ -23,9 +23,9 @@ class ExpenseDialog(QDialog):
     """
     def add_entry(self):
         date = self.expenseDateEdit.date().toString("yyyy-MM-dd")
-        source = self.expenseSourceEdit.text() 
+        source = self.expenseSourceEdit.text().capitalize()
         category = self.expenseCategoryDropdown.currentText()
-        entry_type = "expense"
+        entry_type = "Expense"
         amount = self.expenseAmountSpinbox.text()
         description = self.expenseDescriptionTextEdit.toPlainText()
         month = self.get_current_year_month()

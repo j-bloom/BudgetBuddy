@@ -23,9 +23,9 @@ class IncomeDialog(QDialog):
     """
     def add_entry(self):
         date = self.incomeDateEdit.date().toString("yyyy-MM-dd")
-        source = self.incomeSourceEdit.text() 
+        source = self.incomeSourceEdit.text().capitalize()
         category = self.incomeCategoryDropdown.currentText()
-        entry_type = "income"
+        entry_type = "Income"
         amount = self.incomeAmountSpinbox.text()
         description = self.incomeDescriptionTextEdit.toPlainText()
         month = self.get_current_year_month()
