@@ -332,6 +332,9 @@ QPlainTextEdit::viewport {
           <pointsize>12</pointsize>
          </font>
         </property>
+        <property name="maximum">
+         <double>9999999.990000000223517</double>
+        </property>
        </widget>
       </item>
      </layout>

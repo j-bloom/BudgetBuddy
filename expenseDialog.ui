@@ -123,7 +123,7 @@ QPlainTextEdit::viewport {
     <rect>
      <x>20</x>
      <y>65</y>
-     <width>490</width>
+     <width>568</width>
      <height>54</height>
     </rect>
    </property>
@@ -308,6 +308,9 @@ QPlainTextEdit::viewport {
          <font>
           <pointsize>12</pointsize>
          </font>
+        </property>
+        <property name="maximum">
+         <double>9999999.990000000223517</double>
         </property>
        </widget>
       </item>
