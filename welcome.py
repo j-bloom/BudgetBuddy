@@ -56,6 +56,9 @@ class MainWindow(QDialog):
         self.sourceSort.addItems(self.get_unique_sources(month))
 
         self.sourceSort.currentTextChanged.connect(self.filter_by_source)
+
+        self.categorySort.currentTextChanged.connect(self.filter_by_category)
+
         self.update_totals()
         self.load_table()
         
@@ -325,6 +328,22 @@ class MainWindow(QDialog):
         for row in range(self.table.rowCount()):
             source_item = self.table.item(row, source_column_index)
             if source_item and source_item.text() == selected_source:
+                self.table.setRowHidden(row, False)
+            else:
+                self.table.setRowHidden(row, True)
+
+    def filter_by_category(self, selected_category):
+
+        category_column_index = 2 # Column index 2 is "Category"
+
+        if selected_category == "All":
+            for row in range(self.table.rowCount()):
+                self.table.setRowHidden(row, False)
+            return
+
+        for row in range(self.table.rowCount()):
+            category_item = self.table.item(row, category_column_index)
+            if category_item and category_item.text() == selected_category:
                 self.table.setRowHidden(row, False)
             else:
                 self.table.setRowHidden(row, True)
