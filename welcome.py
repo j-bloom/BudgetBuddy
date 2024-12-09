@@ -49,6 +49,13 @@ class MainWindow(QDialog):
         self.screenshotImportBtn.clicked.connect(self.import_screenshot_image)
         self.searchFilterInput.textChanged.connect(self.filter_table)
         
+        """
+        Filter functionality based on the different budgeting fields
+        """
+        self.sourceSort.addItem("All")
+        self.sourceSort.addItems(self.get_unique_sources(month))
+
+        self.sourceSort.currentTextChanged.connect(self.filter_by_source)
         self.update_totals()
         self.load_table()
         
@@ -297,3 +304,27 @@ class MainWindow(QDialog):
             current_month = self.get_current_year_month()
             controllers.functions.process_ocr_and_insert(file_path, current_month)
             self.reload_table()
+
+    def get_unique_sources(self, month):
+        sources = []
+        query = QSqlQuery()
+        query.exec_(f"SELECT DISTINCT source FROM '{month}'")
+        while query.next():
+            sources.append(query.value(0))
+        return sources
+    
+    def filter_by_source(self, selected_source):
+
+        source_column_index = 1 # Column index 1 is "Source"
+
+        if selected_source == "All":
+            for row in range(self.table.rowCount()):
+                self.table.setRowHidden(row, False)
+            return
+
+        for row in range(self.table.rowCount()):
+            source_item = self.table.item(row, source_column_index)
+            if source_item and source_item.text() == selected_source:
+                self.table.setRowHidden(row, False)
+            else:
+                self.table.setRowHidden(row, True)
