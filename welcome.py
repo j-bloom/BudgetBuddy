@@ -59,6 +59,9 @@ class MainWindow(QDialog):
 
         self.categorySort.currentTextChanged.connect(self.filter_by_category)
 
+        self.entryTypeSort.currentTextChanged.connect(self.filter_by_entry_type)
+
+
         self.update_totals()
         self.load_table()
         
@@ -347,3 +350,20 @@ class MainWindow(QDialog):
                 self.table.setRowHidden(row, False)
             else:
                 self.table.setRowHidden(row, True)
+
+    def filter_by_entry_type(self, selected_entry_type):
+
+        entry_type_column_index = 3 # Column index 3 is "Entry Type"
+
+        if selected_entry_type == "All":
+            for row in range(self.table.rowCount()):
+                self.table.setRowHidden(row, False)
+            return
+
+        for row in range(self.table.rowCount()):
+            entry_type_item = self.table.item(row, entry_type_column_index)
+            if entry_type_item and entry_type_item.text() == selected_entry_type:
+                self.table.setRowHidden(row, False)
+            else:
+                self.table.setRowHidden(row, True)
+
