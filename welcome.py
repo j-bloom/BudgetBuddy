@@ -66,6 +66,8 @@ class MainWindow(QDialog):
 
         self.descriptionSort.textChanged.connect(self.filter_by_description)
 
+        self.clearFilterTableBtn.clicked.connect(self.clear_filters)
+
         self.update_totals()
         self.load_table()
         
@@ -417,3 +419,18 @@ class MainWindow(QDialog):
                     self.table.setRowHidden(row, True)
             else:
                 self.table.setRowHidden(row, True)
+
+    def clear_filters(self):
+        # Reset text-based filters
+        self.descriptionSort.setText("")
+        self.sourceSort.setCurrentIndex(0)
+        self.categorySort.setCurrentIndex(0)
+        self.entryTypeSort.setCurrentIndex(0)
+
+        self.min_spinbox.setValue(0.00)
+        self.max_spinbox.setValue(0.00)
+
+        for row in range(self.table.rowCount()):
+            self.table.setRowHidden(row, False)
+
+        self.reload_table()
