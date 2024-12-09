@@ -64,6 +64,7 @@ class MainWindow(QDialog):
         self.min_spinbox.valueChanged.connect(self.apply_numeric_filter)
         self.max_spinbox.valueChanged.connect(self.apply_numeric_filter)
 
+        self.descriptionSort.textChanged.connect(self.filter_by_description)
 
         self.update_totals()
         self.load_table()
@@ -400,3 +401,19 @@ class MainWindow(QDialog):
             else:
                 self.table.setRowHidden(row, True)
 
+    def filter_by_description(self):
+
+        description_column_index = 5  # Column index 5 is "Description"
+        
+        filter_text = self.descriptionSort.text().strip().lower()
+
+        for row in range(self.table.rowCount()):
+            description_item = self.table.item(row, description_column_index)
+            if description_item:
+                description_text = description_item.text().strip().lower()
+                if filter_text in description_text:
+                    self.table.setRowHidden(row, False)
+                else:
+                    self.table.setRowHidden(row, True)
+            else:
+                self.table.setRowHidden(row, True)
