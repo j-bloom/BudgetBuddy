@@ -61,10 +61,18 @@ class MainWindow(QDialog):
 
         self.entryTypeSort.currentTextChanged.connect(self.filter_by_entry_type)
 
+        self.min_spinbox.valueChanged.connect(self.apply_numeric_filter)
+        self.max_spinbox.valueChanged.connect(self.apply_numeric_filter)
+
 
         self.update_totals()
         self.load_table()
         
+
+    def apply_numeric_filter(self):
+        min_value = self.min_spinbox.value()
+        max_value = self.max_spinbox.value()
+        self.filter_by_amount(min_value, max_value)
 
     def update_totals(self):
         month = self.get_current_year_month()
@@ -364,6 +372,31 @@ class MainWindow(QDialog):
             entry_type_item = self.table.item(row, entry_type_column_index)
             if entry_type_item and entry_type_item.text() == selected_entry_type:
                 self.table.setRowHidden(row, False)
+            else:
+                self.table.setRowHidden(row, True)
+
+    def filter_by_amount(self, min_value, max_value):
+        """
+        Filters rows based on a numeric range specified by min_value and max_value.
+        
+        Parameters:
+            min_value (float): Minimum value in the range.
+            max_value (float): Maximum value in the range.
+        """
+        
+        amount_column_index = 4  # Column index 4 is "Amount"
+
+        for row in range(self.table.rowCount()):
+            numeric_item = self.table.item(row, amount_column_index)
+            if numeric_item:
+                try:
+                    numeric_value = float(numeric_item.text())
+                    if min_value <= numeric_value <= max_value:
+                        self.table.setRowHidden(row, False)
+                    else:
+                        self.table.setRowHidden(row, True)
+                except ValueError:
+                    self.table.setRowHidden(row, True)
             else:
                 self.table.setRowHidden(row, True)
 
