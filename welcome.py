@@ -55,10 +55,13 @@ class MainWindow(QDialog):
         self.sourceSort.addItem("All")
         self.sourceSort.addItems(self.get_unique_sources(month))
 
+        self.sourceSort.setCurrentText("All")
         self.sourceSort.currentTextChanged.connect(self.filter_by_source)
 
+        self.categorySort.setCurrentText("All")
         self.categorySort.currentTextChanged.connect(self.filter_by_category)
 
+        self.entryTypeSort.setCurrentText("All")
         self.entryTypeSort.currentTextChanged.connect(self.filter_by_entry_type)
 
         self.min_spinbox.valueChanged.connect(self.apply_numeric_filter)
