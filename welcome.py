@@ -82,9 +82,9 @@ class MainWindow(QDialog):
 
     def update_totals(self):
         month = self.get_current_year_month()
-        expenses = self.get_total_amounts(month, "expense")
+        expenses = self.get_total_amounts(month, "Expense")
         self.totalExpensesAmount.setText(f"$ {expenses:.2f}")
-        income = self.get_total_amounts(month, "income")
+        income = self.get_total_amounts(month, "Income")
         self.totalIncomeAmount.setText(f"$ {income:.2f}")
 
     """
