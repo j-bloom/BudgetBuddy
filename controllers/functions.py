@@ -4,6 +4,9 @@ import sys
 import pytesseract
 from PIL import Image
 
+"""
+Fetch and display total amounts for income and expenses
+"""
 def get_total_amounts(month, entry_type):
     query = QSqlQuery()
     
