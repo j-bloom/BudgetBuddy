@@ -1,3 +1,4 @@
+import datetime
 from PyQt5.QtSql import QSqlQuery
 from PyQt5.QtWidgets import QMessageBox
 import sys
@@ -80,3 +81,11 @@ def parse_entries(ocr_text):
             if len(data) == 6:  # Ensure we have all 6 fields
                 entries.append(data)
     return entries
+
+"""
+Get current year and month for table creation formated as "YYYY_MM"
+"""
+def get_current_year_month():
+    today = datetime.datetime.now()
+    current_year_month = today.strftime("%Y_%m")
+    return current_year_month

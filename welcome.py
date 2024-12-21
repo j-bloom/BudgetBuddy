@@ -25,7 +25,7 @@ class MainWindow(QDialog):
         allowing the monthly overview to be displayed
         """
         db = Database()
-        month = self.get_current_year_month()
+        month = controllers.functions.get_current_year_month()
         db.create_table(month)
 
         """
@@ -84,7 +84,7 @@ class MainWindow(QDialog):
         self.filter_by_amount(min_value, max_value)
 
     def update_totals(self):
-        month = self.get_current_year_month()
+        month = controllers.functions.get_current_year_month()
         expenses = controllers.functions.get_total_amounts(month, "Expense")
         self.totalExpensesAmount.setText(f"$ {expenses:.2f}")
         income = controllers.functions.get_total_amounts(month, "Income")
@@ -114,7 +114,7 @@ class MainWindow(QDialog):
     """
     def load_table(self):
         self.table.setRowCount(0)
-        month = self.get_current_year_month()
+        month = controllers.functions.get_current_year_month()
         query = QSqlQuery(f"SELECT * FROM '{month}' ORDER BY date DESC")
         row = 0
         while query.next():
