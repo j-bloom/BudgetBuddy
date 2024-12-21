@@ -24,9 +24,9 @@ class MainWindow(QDialog):
         Create the database table with the name of the current year and month,
         allowing the monthly overview to be displayed
         """
-        db = Database()
+        self.db = Database()
         month = controllers.functions.get_current_year_month()
-        db.create_table(month)
+        self.db.create_table(month)
 
         """
         Setup the table object to modify the header
@@ -85,18 +85,10 @@ class MainWindow(QDialog):
 
     def update_totals(self):
         month = controllers.functions.get_current_year_month()
-        expenses = controllers.functions.get_total_amounts(month, "Expense")
+        expenses = self.db.get_total_amounts(month, "Expense")
         self.totalExpensesAmount.setText(f"$ {expenses:.2f}")
-        income = controllers.functions.get_total_amounts(month, "Income")
+        income = self.db.get_total_amounts(month, "Income")
         self.totalIncomeAmount.setText(f"$ {income:.2f}")
-
-    """
-    Get current year and month for table creation formated as "YYYY_MM"
-    """
-    def get_current_year_month(self):
-        today = datetime.datetime.now()
-        current_year_month = today.strftime("%Y_%m")
-        return current_year_month
     
     def display_expense_dialog(self):
         expense_dialog = ExpenseDialog()
