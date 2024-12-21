@@ -12,6 +12,7 @@ import pytesseract
 from PIL import Image
 import controllers.functions
 from controllers.csv import export_to_csv, import_from_csv
+from controllers.ocr import import_screenshot_image
 
 class MainWindow(QDialog):
     def __init__(self):
@@ -215,13 +216,12 @@ class MainWindow(QDialog):
             QMessageBox.warning(self, "Export Failed", f"Failed to export data to PDF: {str(e)}")
 
     def import_screenshot_image(self):
-        pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'  # Adjust this path if needed
         # Open a file dialog to select the image
         file_path, _ = QFileDialog.getOpenFileName(self, "Select Image", "", "Image Files (*.png *.jpg *.jpeg *.bmp)")
         
         if file_path:
-            current_month = self.get_current_year_month()
-            controllers.functions.process_ocr_and_insert(file_path, current_month)
+            current_month = controllers.functions.get_current_year_month()
+            import_screenshot_image(self, file_path, current_month)
             self.reload_table()
 
     def get_unique_sources(self, month):
