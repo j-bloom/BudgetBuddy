@@ -1,4 +1,5 @@
 import datetime
+import os
 from PyQt5.uic import loadUi
 from PyQt5.QtWidgets import QDialog, QTableWidget, QHeaderView, QMessageBox
 from database import Database
@@ -11,7 +12,8 @@ class ExpenseDialog(QDialog):
 
     def __init__(self):
         super(ExpenseDialog, self).__init__()
-        loadUi('expenseDialog.ui', self)
+        ui_file_path = os.path.join(os.path.dirname(__file__), "views", "expenseDialog.ui")
+        loadUi(ui_file_path, self)
 
         self.expenseDateEdit.setDate(QDate.currentDate())
 

@@ -1,6 +1,7 @@
 import datetime
 import csv
 from difflib import SequenceMatcher
+import os
 from PyQt5.uic import loadUi
 from PyQt5.QtWidgets import QDialog, QTableWidget, QHeaderView, QTableWidgetItem, QMessageBox, QFileDialog
 from database import Database
@@ -18,7 +19,8 @@ from controllers.pdf import export_to_pdf
 class MainWindow(QDialog):
     def __init__(self):
         super(MainWindow, self).__init__()
-        loadUi('welcomescreen.ui', self)
+        ui_file_path = os.path.join(os.path.dirname(__file__), "views", "welcomescreen.ui")
+        loadUi(ui_file_path, self)
 
         """
         Create the database table with the name of the current year and month,
