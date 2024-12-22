@@ -86,8 +86,10 @@ class MainWindow(QDialog):
     def update_totals(self):
         month = controllers.functions.get_current_year_month()
         expenses = self.db.get_total_amounts(month, "Expense")
+        expenses = float(expenses) if expenses else 0.0
         self.totalExpensesAmount.setText(f"$ {expenses:.2f}")
         income = self.db.get_total_amounts(month, "Income")
+        income = float(income) if income else 0.0
         self.totalIncomeAmount.setText(f"$ {income:.2f}")
     
     def display_expense_dialog(self):
