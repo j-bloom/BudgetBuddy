@@ -281,6 +281,7 @@ class MainWindow(QDialog):
 
     def clear_filters(self):
         # Reset text-based filters
+        self.searchFilterInput.setText("")
         self.descriptionSort.setText("")
         self.sourceSort.setCurrentIndex(0)
         self.categorySort.setCurrentIndex(0)
