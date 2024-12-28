@@ -15,6 +15,7 @@ import controllers.functions
 from controllers.csv import export_to_csv, import_from_csv
 from controllers.ocr import import_screenshot_image
 from controllers.pdf import export_to_pdf
+from tableSearch import TableSearchDialog
 
 class MainWindow(QDialog):
     def __init__(self):
@@ -44,6 +45,7 @@ class MainWindow(QDialog):
         """
         self.addExpenseBtn.clicked.connect(self.display_expense_dialog)
         self.addIncomeBtn.clicked.connect(self.display_income_dialog)
+        self.monthlyViewBtn.clicked.connect(self.display_table_search_dialog)
 
         """
         Connect the import/export buttons for additional feature functionality
@@ -77,7 +79,7 @@ class MainWindow(QDialog):
         self.clearFilterTableBtn.clicked.connect(self.clear_filters)
 
         self.update_totals()
-        self.load_table()
+        self.load_table(month)
         
 
     def apply_numeric_filter(self):
@@ -104,14 +106,23 @@ class MainWindow(QDialog):
         income_dialog.entry_added.connect(self.reload_table)
         income_dialog.exec_()
 
+    def display_table_search_dialog(self):
+        table_search_dialog = TableSearchDialog()
+        table_search_dialog.selected_table_name.connect(self.load_table_by_name)
+        table_search_dialog.exec_()
+
+    def load_table_by_name(self, table_name):
+        """Load data from the selected table into the table widget."""
+        print(f"Loading table: {table_name}")
+        self.load_table(table_name)  # Replace with your method to load the table
 
     """
     Populate the monthly overview table with the data from the database
     """
-    def load_table(self):
+    def load_table(self, table_name=None):
         self.table.setRowCount(0)
         month = controllers.functions.get_current_year_month()
-        query = QSqlQuery(f"SELECT * FROM '{month}' ORDER BY date DESC")
+        query = QSqlQuery(f"SELECT * FROM '{table_name}' ORDER BY date DESC")
         row = 0
         while query.next():
             date = query.value(1)
