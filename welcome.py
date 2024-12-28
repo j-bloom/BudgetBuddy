@@ -23,6 +23,8 @@ class MainWindow(QDialog):
         ui_file_path = os.path.join(os.path.dirname(__file__), "views", "welcomescreen.ui")
         loadUi(ui_file_path, self)
 
+        self.current_table = None
+
         """
         Create the database table with the name of the current year and month,
         allowing the monthly overview to be displayed
@@ -59,6 +61,16 @@ class MainWindow(QDialog):
         """
         Filter functionality based on the different budgeting fields
         """
+
+        self.active_filters = {
+            "source": None,
+            "category": None,
+            "entry_type": None,
+            "min_amount": None,
+            "max_amount": None,
+            "description": None
+        }
+
         self.sourceSort.addItem("All")
         self.sourceSort.addItems(self.get_unique_sources(month))
 
@@ -77,7 +89,7 @@ class MainWindow(QDialog):
         self.descriptionSort.textChanged.connect(self.filter_by_description)
 
         self.clearFilterTableBtn.clicked.connect(self.clear_filters)
-
+      
         self.update_totals()
         self.load_table(month)
         
@@ -121,6 +133,7 @@ class MainWindow(QDialog):
     """
     def load_table(self, table_name=None):
         self.table.setRowCount(0)
+        self.current_table = table_name
         month = controllers.functions.get_current_year_month()
         query = QSqlQuery(f"SELECT * FROM '{table_name}' ORDER BY date DESC")
         row = 0
@@ -147,7 +160,7 @@ class MainWindow(QDialog):
         self.table.clearContents()
         self.table.setRowCount(0)
         self.update_totals()
-        self.load_table()
+        self.load_table(self.current_table)
 
     def export_to_csv(self):
         export_to_csv(self.table, self)
@@ -155,7 +168,7 @@ class MainWindow(QDialog):
     def import_from_csv(self):
         month = controllers.functions.get_current_year_month()
         import_from_csv(self.table, self, month)
-        self.reload_table()
+        self.reload_table(self.current_table)
 
     def filter_table(self):
         search_text = self.searchFilterInput.text().strip().lower()
@@ -190,7 +203,7 @@ class MainWindow(QDialog):
         if file_path:
             current_month = controllers.functions.get_current_year_month()
             import_screenshot_image(self, file_path, current_month)
-            self.reload_table()
+            self.reload_table(self.current_table)
 
     def get_unique_sources(self, month):
         sources = []
@@ -201,97 +214,81 @@ class MainWindow(QDialog):
         return sources
     
     def filter_by_source(self, selected_source):
-
-        source_column_index = 1 # Column index 1 is "Source"
-
-        if selected_source == "All":
-            for row in range(self.table.rowCount()):
-                self.table.setRowHidden(row, False)
-            return
-
-        for row in range(self.table.rowCount()):
-            source_item = self.table.item(row, source_column_index)
-            if source_item and source_item.text() == selected_source:
-                self.table.setRowHidden(row, False)
-            else:
-                self.table.setRowHidden(row, True)
+        self.active_filters["source"] = None if selected_source == "All" else selected_source
+        self.apply_all_filters()
 
     def filter_by_category(self, selected_category):
-
-        category_column_index = 2 # Column index 2 is "Category"
-
-        if selected_category == "All":
-            for row in range(self.table.rowCount()):
-                self.table.setRowHidden(row, False)
-            return
-
-        for row in range(self.table.rowCount()):
-            category_item = self.table.item(row, category_column_index)
-            if category_item and category_item.text() == selected_category:
-                self.table.setRowHidden(row, False)
-            else:
-                self.table.setRowHidden(row, True)
+        self.active_filters["category"] = None if selected_category == "All" else selected_category
+        self.apply_all_filters()
 
     def filter_by_entry_type(self, selected_entry_type):
-
-        entry_type_column_index = 3 # Column index 3 is "Entry Type"
-
-        if selected_entry_type == "All":
-            for row in range(self.table.rowCount()):
-                self.table.setRowHidden(row, False)
-            return
-
-        for row in range(self.table.rowCount()):
-            entry_type_item = self.table.item(row, entry_type_column_index)
-            if entry_type_item and entry_type_item.text() == selected_entry_type:
-                self.table.setRowHidden(row, False)
-            else:
-                self.table.setRowHidden(row, True)
+        self.active_filters["entry_type"] = None if selected_entry_type == "All" else selected_entry_type
+        self.apply_all_filters()
 
     def filter_by_amount(self, min_value, max_value):
-        """
-        Filters rows based on a numeric range specified by min_value and max_value.
-        
-        Parameters:
-            min_value (float): Minimum value in the range.
-            max_value (float): Maximum value in the range.
-        """
-        
-        amount_column_index = 4  # Column index 4 is "Amount"
-
-        for row in range(self.table.rowCount()):
-            numeric_item = self.table.item(row, amount_column_index)
-            if numeric_item:
-                try:
-                    numeric_value = float(numeric_item.text())
-                    if min_value <= numeric_value <= max_value:
-                        self.table.setRowHidden(row, False)
-                    else:
-                        self.table.setRowHidden(row, True)
-                except ValueError:
-                    self.table.setRowHidden(row, True)
-            else:
-                self.table.setRowHidden(row, True)
+        self.active_filters["min_amount"] = min_value
+        self.active_filters["max_amount"] = max_value
+        self.apply_all_filters()
 
     def filter_by_description(self):
-
-        description_column_index = 5  # Column index 5 is "Description"
-        
         filter_text = self.descriptionSort.text().strip().lower()
+        self.active_filters["description"] = None if not filter_text else filter_text
+        self.apply_all_filters()
 
+    def apply_all_filters(self):
         for row in range(self.table.rowCount()):
-            description_item = self.table.item(row, description_column_index)
-            if description_item:
-                description_text = description_item.text().strip().lower()
-                if filter_text in description_text:
-                    self.table.setRowHidden(row, False)
-                else:
-                    self.table.setRowHidden(row, True)
-            else:
-                self.table.setRowHidden(row, True)
+            show_row = True
+
+            # Check source filter
+            source_item = self.table.item(row, 1)  # Source column index
+            if self.active_filters["source"] and (not source_item or source_item.text() != self.active_filters["source"]):
+                show_row = False
+
+            # Check category filter
+            category_item = self.table.item(row, 2)  # Category column index
+            if self.active_filters["category"] and (not category_item or category_item.text() != self.active_filters["category"]):
+                show_row = False
+
+            # Check entry type filter
+            entry_type_item = self.table.item(row, 3)  # Entry Type column index
+            if self.active_filters["entry_type"] and (not entry_type_item or entry_type_item.text() != self.active_filters["entry_type"]):
+                show_row = False
+
+            # Check amount filter
+            amount_item = self.table.item(row, 4)  # Amount column index
+            if amount_item:
+                try:
+                    amount_value = float(amount_item.text())
+                    if self.active_filters["min_amount"] and amount_value < self.active_filters["min_amount"]:
+                        show_row = False
+                    if self.active_filters["max_amount"] and amount_value > self.active_filters["max_amount"]:
+                        show_row = False
+                except ValueError:
+                    show_row = False
+            elif self.active_filters["min_amount"] or self.active_filters["max_amount"]:
+                show_row = False
+
+            # Check description filter
+            description_item = self.table.item(row, 5)  # Description column index
+            if self.active_filters["description"]:
+                description_text = description_item.text().strip().lower() if description_item else ""
+                if self.active_filters["description"] not in description_text:
+                    show_row = False
+
+            # Show or hide row based on all filters
+            self.table.setRowHidden(row, not show_row)
 
     def clear_filters(self):
         # Reset text-based filters
+        self.active_filters = {
+            "source": None,
+            "category": None,
+            "entry_type": None,
+            "min_amount": None,
+            "max_amount": None,
+            "description": None
+        }
+
         self.searchFilterInput.setText("")
         self.descriptionSort.setText("")
         self.sourceSort.setCurrentIndex(0)
@@ -301,7 +298,6 @@ class MainWindow(QDialog):
         self.min_spinbox.setValue(0.00)
         self.max_spinbox.setValue(0.00)
 
-        for row in range(self.table.rowCount()):
-            self.table.setRowHidden(row, False)
+        self.apply_all_filters()
 
-        self.reload_table()
+        self.reload_table(self.current_table)
