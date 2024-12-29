@@ -23,15 +23,14 @@ class MainWindow(QDialog):
         ui_file_path = os.path.join(os.path.dirname(__file__), "views", "welcomescreen.ui")
         loadUi(ui_file_path, self)
 
-        self.current_table = None
-
         """
         Create the database table with the name of the current year and month,
         allowing the monthly overview to be displayed
         """
         self.db = Database()
         month = controllers.functions.get_current_year_month()
-        self.db.create_table(month)
+        self.current_table = month
+        self.db.create_table(self.current_table)
 
         """
         Setup the table object to modify the header
@@ -72,7 +71,7 @@ class MainWindow(QDialog):
         }
 
         self.sourceSort.addItem("All")
-        self.sourceSort.addItems(self.get_unique_sources(month))
+        self.sourceSort.addItems(self.get_unique_sources(self.current_table))
 
         self.sourceSort.setCurrentText("All")
         self.sourceSort.currentTextChanged.connect(self.filter_by_source)
@@ -90,8 +89,8 @@ class MainWindow(QDialog):
 
         self.clearFilterTableBtn.clicked.connect(self.clear_filters)
       
-        self.update_totals()
-        self.load_table(month)
+        self.update_totals(self.current_table)
+        self.load_table(self.current_table)
         
 
     def apply_numeric_filter(self):
@@ -99,12 +98,11 @@ class MainWindow(QDialog):
         max_value = self.max_spinbox.value()
         self.filter_by_amount(min_value, max_value)
 
-    def update_totals(self):
-        month = controllers.functions.get_current_year_month()
-        expenses = self.db.get_total_amounts(month, "Expense")
+    def update_totals(self, selected_table):
+        expenses = self.db.get_total_amounts(selected_table, "Expense")
         expenses = float(expenses) if expenses else 0.0
         self.totalExpensesAmount.setText(f"$ {expenses:.2f}")
-        income = self.db.get_total_amounts(month, "Income")
+        income = self.db.get_total_amounts(selected_table, "Income")
         income = float(income) if income else 0.0
         self.totalIncomeAmount.setText(f"$ {income:.2f}")
     
@@ -120,21 +118,19 @@ class MainWindow(QDialog):
 
     def display_table_search_dialog(self):
         table_search_dialog = TableSearchDialog()
-        table_search_dialog.selected_table_name.connect(self.load_table_by_name)
+        table_search_dialog.selected_table_name.connect(self.load_table)
+        table_search_dialog.selected_table_name.connect(self.update_totals)
         table_search_dialog.exec_()
-
-    def load_table_by_name(self, table_name):
-        """Load data from the selected table into the table widget."""
-        print(f"Loading table: {table_name}")
-        self.load_table(table_name)  # Replace with your method to load the table
 
     """
     Populate the monthly overview table with the data from the database
+
+    Returns:
+    All entries from the specified table in the database
     """
     def load_table(self, table_name=None):
         self.table.setRowCount(0)
         self.current_table = table_name
-        month = controllers.functions.get_current_year_month()
         query = QSqlQuery(f"SELECT * FROM '{table_name}' ORDER BY date DESC")
         row = 0
         while query.next():
@@ -159,7 +155,7 @@ class MainWindow(QDialog):
     def reload_table(self):
         self.table.clearContents()
         self.table.setRowCount(0)
-        self.update_totals()
+        self.update_totals(self.current_table)
         self.load_table(self.current_table)
 
     def export_to_csv(self):
@@ -168,7 +164,7 @@ class MainWindow(QDialog):
     def import_from_csv(self):
         month = controllers.functions.get_current_year_month()
         import_from_csv(self.table, self, month)
-        self.reload_table(self.current_table)
+        self.reload_table()
 
     def filter_table(self):
         search_text = self.searchFilterInput.text().strip().lower()
@@ -192,7 +188,6 @@ class MainWindow(QDialog):
             
             self.table.setRowHidden(row, not row_match)
 
-
     def export_to_pdf(self):
         export_to_pdf(self, self.table)
 
@@ -203,8 +198,11 @@ class MainWindow(QDialog):
         if file_path:
             current_month = controllers.functions.get_current_year_month()
             import_screenshot_image(self, file_path, current_month)
-            self.reload_table(self.current_table)
+            self.reload_table()
 
+    """
+    Get unique sources for the selected month and populate the source dropdown menu
+    """
     def get_unique_sources(self, month):
         sources = []
         query = QSqlQuery()
@@ -300,4 +298,4 @@ class MainWindow(QDialog):
 
         self.apply_all_filters()
 
-        self.reload_table(self.current_table)
+        self.reload_table()
