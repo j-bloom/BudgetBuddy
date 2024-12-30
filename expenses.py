@@ -10,7 +10,7 @@ class ExpenseDialog(QDialog):
     
     entry_added = pyqtSignal()
 
-    def __init__(self):
+    def __init__(self, current_table):
         super(ExpenseDialog, self).__init__()
         ui_file_path = os.path.join(os.path.dirname(__file__), "views", "expenseDialog.ui")
         loadUi(ui_file_path, self)
@@ -20,6 +20,7 @@ class ExpenseDialog(QDialog):
         self.expenseAddPushButton.clicked.connect(self.add_entry)
         self.expenseCancelPushButton.clicked.connect(self.close)
     
+        self.current_table = current_table
     """
     Add new entry to SQL database from user input
     """
@@ -30,9 +31,8 @@ class ExpenseDialog(QDialog):
         entry_type = "Expense"
         amount = self.expenseAmountSpinbox.text()
         description = self.expenseDescriptionTextEdit.toPlainText()
-        month = self.get_current_year_month()
         query = QSqlQuery()
-        query.prepare(f"""INSERT INTO '{month}' (date, source, category, entry_type, amount, description) 
+        query.prepare(f"""INSERT INTO '{self.current_table}' (date, source, category, entry_type, amount, description) 
                             VALUES (:date, :source, :category, :entry_type, :amount, :description)
                         """)
         

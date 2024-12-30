@@ -23,6 +23,8 @@ class MainWindow(QDialog):
         ui_file_path = os.path.join(os.path.dirname(__file__), "views", "welcomescreen.ui")
         loadUi(ui_file_path, self)
 
+        self.current_table = None
+        
         """
         Create the database table with the name of the current year and month,
         allowing the monthly overview to be displayed
@@ -107,12 +109,12 @@ class MainWindow(QDialog):
         self.totalIncomeAmount.setText(f"$ {income:.2f}")
     
     def display_expense_dialog(self):
-        expense_dialog = ExpenseDialog()
+        expense_dialog = ExpenseDialog(self.current_table)
         expense_dialog.entry_added.connect(self.reload_table)
         expense_dialog.exec_()
 
     def display_income_dialog(self):
-        income_dialog = IncomeDialog()
+        income_dialog = IncomeDialog(self.current_table)
         income_dialog.entry_added.connect(self.reload_table)
         income_dialog.exec_()
 
@@ -120,6 +122,7 @@ class MainWindow(QDialog):
         table_search_dialog = TableSearchDialog()
         table_search_dialog.selected_table_name.connect(self.load_table)
         table_search_dialog.selected_table_name.connect(self.update_totals)
+        self.current_table = table_search_dialog.selected_table_name
         table_search_dialog.exec_()
 
     """
@@ -163,7 +166,11 @@ class MainWindow(QDialog):
 
     def import_from_csv(self):
         month = controllers.functions.get_current_year_month()
-        import_from_csv(self.table, self, month)
+
+        if self.current_table is None:
+            self.current_table = month
+            
+        import_from_csv(self.table, self, self.current_table)
         self.reload_table()
 
     def filter_table(self):
@@ -206,7 +213,7 @@ class MainWindow(QDialog):
     def get_unique_sources(self, month):
         sources = []
         query = QSqlQuery()
-        query.exec_(f"SELECT DISTINCT source FROM '{month}'")
+        query.exec_(f"SELECT DISTINCT source FROM '{self.current_table}'")
         while query.next():
             sources.append(query.value(0))
         return sources

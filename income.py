@@ -10,7 +10,7 @@ class IncomeDialog(QDialog):
 
     entry_added = pyqtSignal()
 
-    def __init__(self):
+    def __init__(self, current_table):
         super(IncomeDialog, self).__init__()
         ui_file_path = os.path.join(os.path.dirname(__file__), "views", "incomeDialog.ui")
         loadUi(ui_file_path, self)
@@ -19,7 +19,8 @@ class IncomeDialog(QDialog):
 
         self.incomeAddPushButton.clicked.connect(self.add_entry)
         self.incomeCancelPushButton.clicked.connect(self.close)
-    
+
+        self.current_table = current_table    
     """
     Add new entry to SQL database from user input
     """
@@ -30,9 +31,8 @@ class IncomeDialog(QDialog):
         entry_type = "Income"
         amount = self.incomeAmountSpinbox.text()
         description = self.incomeDescriptionTextEdit.toPlainText()
-        month = self.get_current_year_month()
         query = QSqlQuery()
-        query.prepare(f"""INSERT INTO '{month}' (date, source, category, entry_type, amount, description) 
+        query.prepare(f"""INSERT INTO '{self.current_table}' (date, source, category, entry_type, amount, description) 
                             VALUES (:date, :source, :category, :entry_type, :amount, :description)
                         """)
         
