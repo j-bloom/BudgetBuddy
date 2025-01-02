@@ -19,7 +19,7 @@ class Database:
                         date DATE NOT NULL,
                         source TEXT,
                         category TEXT,
-                        entry_type TEXT DEFAULT 'expense',
+                        entry_type TEXT DEFAULT 'Expense',
                         amount REAL,
                         description TEXT
                     )
