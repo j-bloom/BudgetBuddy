@@ -2,8 +2,10 @@ import datetime
 import csv
 from difflib import SequenceMatcher
 import os
+import sys
 from PyQt5.uic import loadUi
 from PyQt5.QtWidgets import QDialog, QTableWidget, QHeaderView, QTableWidgetItem, QMessageBox, QFileDialog
+import controllers.ocr
 from database import Database
 from expenses import ExpenseDialog
 from income import IncomeDialog
@@ -13,7 +15,7 @@ import pytesseract
 from PIL import Image
 import controllers.functions
 from controllers.csv import export_to_csv, import_from_csv
-from controllers.ocr import import_screenshot_image
+import controllers.ocr
 from controllers.pdf import export_to_pdf
 from tableSearch import TableSearchDialog
 
@@ -199,13 +201,19 @@ class MainWindow(QDialog):
         export_to_pdf(self, self.table)
 
     def import_screenshot_image(self):
+        pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'  # Adjust this path if needed
         # Open a file dialog to select the image
-        file_path, _ = QFileDialog.getOpenFileName(self, "Select Image", "", "Image Files (*.png *.jpg *.jpeg *.bmp)")
+        file_path, _ = QFileDialog.getOpenFileName(self, "Select Image", "", "Image Files (*.png *.PNG *.jpg *.jpeg *.bmp)")
+        
+        month = controllers.functions.get_current_year_month()
+        if self.current_table is None:
+            self.current_table = month
         
         if file_path:
-            current_month = controllers.functions.get_current_year_month()
-            import_screenshot_image(self, file_path, current_month)
-            self.reload_table()
+
+            current_month = self.current_table  # Get the current month/year for the table name
+            controllers.ocr.process_ocr_and_insert(file_path, current_month)
+            self.reload_table()  # Reload the table after inserting
 
     """
     Get unique sources for the selected month and populate the source dropdown menu

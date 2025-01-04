@@ -3,26 +3,7 @@ from PIL import Image
 from PyQt5.QtWidgets import QMessageBox
 import controllers.functions
 from PyQt5.QtSql import QSqlQuery
-
-def import_screenshot_image(parent_widget, file_path, current_month):
-    # Set the path to the Tesseract OCR engine
-    pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'  # Adjust if needed
-
-    try:
-        # Open the selected image
-        img = Image.open(file_path)
-        
-        # Use pytesseract to extract text from the image
-        extracted_text = pytesseract.image_to_string(img)
-
-        # Process the extracted text and insert into the database
-        controllers.functions.process_ocr_and_insert(extracted_text, current_month)
-
-        # Notify user of success
-        QMessageBox.information(parent_widget, "OCR Import Successful", "Data has been successfully imported from the screenshot.")
-    except Exception as e:
-        # Handle exceptions (e.g., Tesseract not working, image issues)
-        QMessageBox.critical(parent_widget, "OCR Import Failed", f"An error occurred while processing the image: {e}")
+import sys
 
 def ocr_from_image(image_path):
     """Extract text from an image using Tesseract OCR."""
@@ -43,9 +24,9 @@ def insert_entries_to_db(entries, month):
         query.prepare(f"""INSERT INTO '{month}' (date, source, category, entry_type, amount, description)
                         VALUES (?, ?, ?, ?, ?, ?)""")
         query.addBindValue(entry[0])  # date
-        query.addBindValue(entry[1])  # source
+        query.addBindValue(entry[1])  # store_name
         query.addBindValue(entry[2])  # category
-        query.addBindValue(entry[3]) # entry_type
+        query.addBindValue('Expense')  # entry_type
         query.addBindValue(entry[4])  # amount
         query.addBindValue(entry[5])  # description
         
