@@ -4,7 +4,8 @@ from difflib import SequenceMatcher
 import os
 import sys
 from PyQt5.uic import loadUi
-from PyQt5.QtWidgets import QDialog, QTableWidget, QHeaderView, QTableWidgetItem, QMessageBox, QFileDialog
+from PyQt5.QtWidgets import QDialog, QTableWidget, QHeaderView, QTableWidgetItem, QMessageBox, QFileDialog, QAbstractItemView, QTextEdit, QVBoxLayout, QLabel
+from PyQt5.QtGui import QFont
 import controllers.ocr
 from database import Database
 from expenses import ExpenseDialog
@@ -44,6 +45,10 @@ class MainWindow(QDialog):
 
         header = self.table.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.Stretch)
+
+        self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.table.cellDoubleClicked.connect(self.handle_double_click)
+
 
         """
         Connect the income/expense buttons to their respective views/dialogs
@@ -96,6 +101,34 @@ class MainWindow(QDialog):
         self.update_totals(self.current_table)
         self.load_table(self.current_table)
         
+    def handle_double_click(self, row, column):
+        if column == 5:  # Check if the "Description" column is clicked
+            description = self.table.item(row, column).text()
+            self.show_description_popup(description)
+    
+    def show_description_popup(self, description):
+        dialog = QDialog(self)
+        dialog.setWindowTitle("Full Description")
+        dialog.resize(400, 200)
+        
+        layout = QVBoxLayout()
+        label = QLabel("Full Description:")
+        label_font = QFont()
+        label_font.setPointSize(12)
+        label.setFont(label_font)
+        layout.addWidget(label)
+        
+        # Read-only text edit
+        text_edit = QTextEdit()
+        text_edit.setReadOnly(True)
+        text_edit.setText(description)
+        text_edit_font = QFont()
+        text_edit_font.setPointSize(12)
+        text_edit.setFont(text_edit_font)
+        layout.addWidget(text_edit)
+        
+        dialog.setLayout(layout)
+        dialog.exec_()
 
     def apply_numeric_filter(self):
         min_value = self.min_spinbox.value()

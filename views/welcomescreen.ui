@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Budget Buddy</string>
   </property>
   <property name="styleSheet">
    <string notr="true">QPushButton {
@@ -74,9 +74,9 @@ QLineEdit::viewport {
    <property name="geometry">
     <rect>
      <x>180</x>
-     <y>220</y>
+     <y>230</y>
      <width>901</width>
-     <height>441</height>
+     <height>431</height>
     </rect>
    </property>
    <property name="font">
@@ -104,9 +104,6 @@ QLineEdit::viewport {
       <pointsize>12</pointsize>
      </font>
     </property>
-    <property name="textAlignment">
-     <set>AlignCenter</set>
-    </property>
    </column>
    <column>
     <property name="text">
@@ -116,9 +113,6 @@ QLineEdit::viewport {
      <font>
       <pointsize>12</pointsize>
      </font>
-    </property>
-    <property name="textAlignment">
-     <set>AlignCenter</set>
     </property>
    </column>
    <column>
@@ -130,9 +124,6 @@ QLineEdit::viewport {
       <pointsize>12</pointsize>
      </font>
     </property>
-    <property name="textAlignment">
-     <set>AlignCenter</set>
-    </property>
    </column>
    <column>
     <property name="text">
@@ -142,9 +133,6 @@ QLineEdit::viewport {
      <font>
       <pointsize>12</pointsize>
      </font>
-    </property>
-    <property name="textAlignment">
-     <set>AlignCenter</set>
     </property>
    </column>
    <column>
@@ -156,9 +144,6 @@ QLineEdit::viewport {
       <pointsize>12</pointsize>
      </font>
     </property>
-    <property name="textAlignment">
-     <set>AlignCenter</set>
-    </property>
    </column>
    <column>
     <property name="text">
@@ -168,9 +153,6 @@ QLineEdit::viewport {
      <font>
       <pointsize>12</pointsize>
      </font>
-    </property>
-    <property name="textAlignment">
-     <set>AlignCenter</set>
     </property>
    </column>
   </widget>
@@ -357,7 +339,7 @@ QLineEdit::viewport {
       <x>10</x>
       <y>50</y>
       <width>871</width>
-      <height>54</height>
+      <height>58</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -394,7 +376,7 @@ QLineEdit::viewport {
            <pointsize>12</pointsize>
           </font>
          </property>
-         <property name="placeholderText" stdset="0">
+         <property name="placeholderText">
           <string>--Select Option--</string>
          </property>
         </widget>
@@ -434,7 +416,7 @@ QLineEdit::viewport {
            <pointsize>12</pointsize>
           </font>
          </property>
-         <property name="placeholderText" stdset="0">
+         <property name="placeholderText">
           <string>--Select Option--</string>
          </property>
          <item>
@@ -534,7 +516,7 @@ QLineEdit::viewport {
            <pointsize>12</pointsize>
           </font>
          </property>
-         <property name="placeholderText" stdset="0">
+         <property name="placeholderText">
           <string>--Select Option--</string>
          </property>
          <item>
@@ -879,6 +861,25 @@ QLineEdit::viewport {
      </widget>
     </item>
    </layout>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>630</x>
+     <y>210</y>
+     <width>441</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>8</pointsize>
+     <italic>false</italic>
+    </font>
+   </property>
+   <property name="text">
+    <string>*If full description cannot be viewed, double click on description to view full entry</string>
+   </property>
   </widget>
  </widget>
  <resources/>
