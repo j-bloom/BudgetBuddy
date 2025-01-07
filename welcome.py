@@ -66,6 +66,8 @@ class MainWindow(QDialog):
         self.screenshotImportBtn.clicked.connect(self.import_screenshot_image)
         self.searchFilterInput.textChanged.connect(self.filter_table)
         
+        self.deleteEntryBtn.clicked.connect(self.delete_entry)
+
         """
         Filter functionality based on the different budgeting fields
         """
@@ -130,6 +132,55 @@ class MainWindow(QDialog):
         dialog.setLayout(layout)
         dialog.exec_()
 
+    """
+    Delete selected entry from SQL database based on the entry id
+    """
+    def delete_entry(self):
+        selected_row = self.table.currentRow()
+        if selected_row < 0:
+            QMessageBox.warning(None, "No Entry Chosen", "Please select an entry to delete!")
+            return
+
+        # Get the values of the selected row to identify the entry in the database
+        date = self.table.item(selected_row, 0).text()
+        source = self.table.item(selected_row, 1).text()
+        category = self.table.item(selected_row, 2).text()
+        entry_type = self.table.item(selected_row, 3).text()
+        amount = self.table.item(selected_row, 4).text()
+        description = self.table.item(selected_row, 5).text()
+
+        confirm = QMessageBox.question(self, "Delete Entry", "Are you sure you want to delete this entry?", QMessageBox.Yes | QMessageBox.No)
+
+
+        if confirm == QMessageBox.No:
+            return
+
+        month = controllers.functions.get_current_year_month()
+        if self.current_table is None:
+            self.current_table = month
+
+        query = QSqlQuery()
+        query.prepare(f"""DELETE FROM '{self.current_table}' WHERE 
+                        date = :date AND 
+                        source = :source AND
+                        category = :category AND 
+                        entry_type = :entry_type AND 
+                        amount = :amount AND 
+                        description = :description
+                      """)
+
+        query.bindValue(":date", date)
+        query.bindValue(":source", source)
+        query.bindValue(":category", category)
+        query.bindValue(":entry_type", entry_type)
+        query.bindValue(":amount", amount)
+        query.bindValue(":description", description)
+
+        if not query.exec_():
+            QMessageBox.warning(self, "Error", "Failed to delete entry: " + query.lastError().text())
+        else:
+            self.reload_table()  
+
     def apply_numeric_filter(self):
         min_value = self.min_spinbox.value()
         max_value = self.max_spinbox.value()
@@ -169,7 +220,7 @@ class MainWindow(QDialog):
     def load_table(self, table_name=None):
         self.table.setRowCount(0)
         self.current_table = table_name
-        query = QSqlQuery(f"SELECT * FROM '{table_name}' ORDER BY date DESC")
+        query = QSqlQuery(f"SELECT * FROM '{self.current_table}' ORDER BY date DESC")
         row = 0
         while query.next():
             date = query.value(1)
