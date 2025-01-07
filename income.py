@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QDialog, QTableWidget, QHeaderView, QMessageBox
 from database import Database
 from PyQt5.QtSql import QSqlDatabase, QSqlQuery
 from PyQt5.QtCore import pyqtSignal, QDate
+import controllers.functions
 
 class IncomeDialog(QDialog):
 
@@ -31,29 +32,36 @@ class IncomeDialog(QDialog):
         entry_type = "Income"
         amount = self.incomeAmountSpinbox.text()
         description = self.incomeDescriptionTextEdit.toPlainText()
-        query = QSqlQuery()
-        query.prepare(f"""INSERT INTO '{self.current_table}' (date, source, category, entry_type, amount, description) 
-                            VALUES (:date, :source, :category, :entry_type, :amount, :description)
-                        """)
-        
-        query.bindValue(":date", date)
-        query.bindValue(":source", source)
-        query.bindValue(":category", category)
-        query.bindValue(":entry_type", entry_type)
-        query.bindValue(":amount", amount)
-        query.bindValue(":description", description)
-        
-        if not query.exec_():
-            error = query.lastError().text()
-            QMessageBox.warning(self, "Add Entry Failed", f"Failed to add entry: {error}")
+
+        exists = controllers.functions.is_duplicate_entry(self.current_table, date, source, category, entry_type, amount, description)
+
+        if not exists:
+            query = QSqlQuery()
+            query.prepare(f"""INSERT INTO '{self.current_table}' (date, source, category, entry_type, amount, description) 
+                                VALUES (:date, :source, :category, :entry_type, :amount, :description)
+                            """)
+            
+            query.bindValue(":date", date)
+            query.bindValue(":source", source)
+            query.bindValue(":category", category)
+            query.bindValue(":entry_type", entry_type)
+            query.bindValue(":amount", amount)
+            query.bindValue(":description", description)
+            
+            if not query.exec_():
+                error = query.lastError().text()
+                QMessageBox.warning(self, "Add Entry Failed", f"Failed to add entry: {error}")
+            else:
+                self.incomeDateEdit.setDate(QDate.currentDate())
+                self.incomeSourceEdit.clear() 
+                self.incomeCategoryDropdown.setCurrentIndex(0)
+                self.incomeAmountSpinbox.clear()
+                self.incomeDescriptionTextEdit.clear()
+                self.entry_added.emit()
+                self.close()
         else:
-            self.incomeDateEdit.setDate(QDate.currentDate())
-            self.incomeSourceEdit.clear() 
-            self.incomeCategoryDropdown.setCurrentIndex(0)
-            self.incomeAmountSpinbox.clear()
-            self.incomeDescriptionTextEdit.clear()
-            self.entry_added.emit()
-            self.close()
+            QMessageBox.warning(self, "Duplicate Entry", "An entry with the same date, source, category, entry type, amount, and description already exists. If you want to duplicate this entry please use the 'Duplicate Entry' button.")
+
 
     """
     Get current year and month for table creation formated as "YYYY_MM"

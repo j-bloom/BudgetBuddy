@@ -40,3 +40,45 @@ def get_current_year_month():
     today = datetime.datetime.now()
     current_year_month = today.strftime("%Y_%m")
     return current_year_month
+
+def is_duplicate_entry(table_name, date, source, category, entry_type, amount, description):
+    """
+    Checks if an entry already exists in the database.
+
+    Args:
+        table_name (str): Name of the table to check.
+        date (str): Date of the entry.
+        source (str): Source of the entry.
+        category (str): Category of the entry.
+        entry_type (str): Type of the entry (Income/Expense).
+        amount (float): Amount of the entry.
+        description (str): Description of the entry.
+
+    Returns:
+        bool: True if a duplicate entry exists, False otherwise.
+    """
+    query = QSqlQuery()
+    query.prepare(f"""
+        SELECT COUNT(*) FROM '{table_name}'
+        WHERE date = :date AND 
+              source = :source AND 
+              category = :category AND 
+              entry_type = :entry_type AND 
+              amount = :amount AND 
+              description = :description
+    """)
+    
+    query.bindValue(":date", date)
+    query.bindValue(":source", source)
+    query.bindValue(":category", category)
+    query.bindValue(":entry_type", entry_type)
+    query.bindValue(":amount", amount)
+    query.bindValue(":description", description)
+    
+    if query.exec_():
+        if query.next() and query.value(0) > 0:
+            return True  # Duplicate exists
+    else:
+        print(f"Query execution error: {query.lastError().text()}")
+    
+    return False
