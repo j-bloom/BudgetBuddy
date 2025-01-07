@@ -67,6 +67,7 @@ class MainWindow(QDialog):
         self.searchFilterInput.textChanged.connect(self.filter_table)
         
         self.deleteEntryBtn.clicked.connect(self.delete_entry)
+        self.duplicateEntryBtn.clicked.connect(self.duplicate_entry)
 
         """
         Filter functionality based on the different budgeting fields
@@ -131,6 +132,67 @@ class MainWindow(QDialog):
         
         dialog.setLayout(layout)
         dialog.exec_()
+
+    def duplicate_entry(self):
+        """
+        Duplicates the selected entry, appends ' - (Copy)' to the description,
+        and inserts it into the database and QTableWidget using a prepared statement.
+        """
+        # Check if a row is selected
+        selected_items = self.table.selectedItems()
+        if not selected_items:
+            QMessageBox.warning(self, "No Selection", "Please select an entry to duplicate.")
+            return
+
+        # Get the selected row index
+        selected_row = self.table.currentRow()
+
+        # Extract data from the selected row
+        date = self.table.item(selected_row, 0).text()
+        source = self.table.item(selected_row, 1).text()
+        category = self.table.item(selected_row, 2).text()
+        entry_type = self.table.item(selected_row, 3).text()
+        amount = self.table.item(selected_row, 4).text()
+        description = self.table.item(selected_row, 5).text()
+
+        # Append " - (Copy)" to the description
+        new_description = f"{description} - (Copy)"
+
+        # Prepare the SQL query for insertion
+        query = QSqlQuery()
+        query.prepare(f"""
+            INSERT INTO '{self.current_table}' (date, source, category, entry_type, amount, description)
+            VALUES (:date, :source, :category, :entry_type, :amount, :description)
+        """)
+
+        # Bind values to the query
+        query.bindValue(":date", date)
+        query.bindValue(":source", source)
+        query.bindValue(":category", category)
+        query.bindValue(":entry_type", entry_type)
+        query.bindValue(":amount", amount)
+        query.bindValue(":description", new_description)
+
+        # Execute the query
+        if query.exec_():
+            # Add the duplicated entry to the QTableWidget
+            row_position = self.table.rowCount()
+            self.table.insertRow(row_position)
+
+            self.table.setItem(row_position, 0, QTableWidgetItem(date))
+            self.table.setItem(row_position, 1, QTableWidgetItem(source))
+            self.table.setItem(row_position, 2, QTableWidgetItem(category))
+            self.table.setItem(row_position, 3, QTableWidgetItem(entry_type))
+            self.table.setItem(row_position, 4, QTableWidgetItem(amount))
+            self.table.setItem(row_position, 5, QTableWidgetItem(new_description))
+
+            QMessageBox.information(self, "Success", "Entry duplicated successfully!")
+        else:
+            # Show an error message if the query fails
+            error_message = query.lastError().text()
+            QMessageBox.critical(self, "Error", f"Failed to duplicate entry: {error_message}")
+
+        self.reload_table()
 
     """
     Delete selected entry from SQL database based on the entry id
