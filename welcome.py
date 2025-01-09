@@ -279,7 +279,7 @@ class MainWindow(QDialog):
         # Pass the data and record ID to the EditDialog
         edit_dialog = EditDialog(self, current_table={self.current_table}, date=date, source=source, category=category, entry_type=entry_type, amount=amount, description=description)
         edit_dialog.entry_updated.connect(self.reload_table)  # Connect the signal
-        edit_dialog.exec_()s
+        edit_dialog.exec_()
 
     def display_expense_dialog(self):
         expense_dialog = ExpenseDialog(self.current_table)
