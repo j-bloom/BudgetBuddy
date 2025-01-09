@@ -261,8 +261,18 @@ QLineEdit::viewport {
      <x>180</x>
      <y>90</y>
      <width>891</width>
-     <height>111</height>
+     <height>121</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QFrame{
+	border: 1px solid gray;
+	border-radius: 5px;
+}
+
+QLabel {
+	border: none;
+}</string>
    </property>
    <property name="frameShape">
     <enum>QFrame::StyledPanel</enum>
@@ -291,7 +301,7 @@ QLineEdit::viewport {
    <widget class="QLabel" name="SortAndFilterLabel">
     <property name="geometry">
      <rect>
-      <x>0</x>
+      <x>10</x>
       <y>10</y>
       <width>101</width>
       <height>31</height>
@@ -339,7 +349,7 @@ QLineEdit::viewport {
       <x>10</x>
       <y>50</y>
       <width>871</width>
-      <height>58</height>
+      <height>60</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
