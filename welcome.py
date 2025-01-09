@@ -4,10 +4,11 @@ from difflib import SequenceMatcher
 import os
 import sys
 from PyQt5.uic import loadUi
-from PyQt5.QtWidgets import QDialog, QTableWidget, QHeaderView, QTableWidgetItem, QMessageBox, QFileDialog, QAbstractItemView, QTextEdit, QVBoxLayout, QLabel
+from PyQt5.QtWidgets import QDialog, QTableWidget, QHeaderView, QTableWidgetItem, QMessageBox, QFileDialog, QAbstractItemView, QTextEdit, QVBoxLayout, QLabel, QInputDialog, QLineEdit
 from PyQt5.QtGui import QFont
 import controllers.ocr
 from database import Database
+from editEntry import EditDialog
 from expenses import ExpenseDialog
 from income import IncomeDialog
 from PyQt5.QtSql import QSqlQuery
@@ -66,6 +67,7 @@ class MainWindow(QDialog):
         self.screenshotImportBtn.clicked.connect(self.import_screenshot_image)
         self.searchFilterInput.textChanged.connect(self.filter_table)
         
+        self.editEntryBtn.clicked.connect(self.edit_entry)
         self.deleteEntryBtn.clicked.connect(self.delete_entry)
         self.duplicateEntryBtn.clicked.connect(self.duplicate_entry)
 
@@ -222,14 +224,15 @@ class MainWindow(QDialog):
             self.current_table = month
 
         query = QSqlQuery()
-        query.prepare(f"""DELETE FROM '{self.current_table}' WHERE 
-                        date = :date AND 
-                        source = :source AND
-                        category = :category AND 
-                        entry_type = :entry_type AND 
-                        amount = :amount AND 
-                        description = :description
-                      """)
+        query.prepare(f"""DELETE FROM '{self.current_table}' 
+                        WHERE 
+                            date = :date AND 
+                            source = :source AND
+                            category = :category AND 
+                            entry_type = :entry_type AND 
+                            amount = :amount AND 
+                            description = :description
+                        """)
 
         query.bindValue(":date", date)
         query.bindValue(":source", source)
@@ -256,6 +259,28 @@ class MainWindow(QDialog):
         income = float(income) if income else 0.0
         self.totalIncomeAmount.setText(f"$ {income:.2f}")
     
+    def edit_entry(self):
+        selected_row = self.table.currentRow()
+        if selected_row < 0:
+            QMessageBox.warning(None, "No Entry Chosen", "Please select an entry to edit!")
+            return
+        
+        month = controllers.functions.get_current_year_month()
+        if self.current_table is None:
+            self.current_table = month
+
+        date = self.table.item(selected_row, 0).text()
+        source = self.table.item(selected_row, 1).text()
+        category = self.table.item(selected_row, 2).text()
+        entry_type = self.table.item(selected_row, 3).text()
+        amount = self.table.item(selected_row, 4).text()
+        description = self.table.item(selected_row, 5).text()
+
+        # Pass the data and record ID to the EditDialog
+        edit_dialog = EditDialog(self, current_table={self.current_table}, date=date, source=source, category=category, entry_type=entry_type, amount=amount, description=description)
+        edit_dialog.entry_updated.connect(self.reload_table)  # Connect the signal
+        edit_dialog.exec_()s
+
     def display_expense_dialog(self):
         expense_dialog = ExpenseDialog(self.current_table)
         expense_dialog.entry_added.connect(self.reload_table)
