@@ -21,7 +21,7 @@ def export_to_pdf(parent_widget, table):
 
         # Add table headers
         headers = ["Date", "Source", "Category", "Entry Type", "Amount", "Description"]
-        column_widths = [30, 30, 30, 30, 20, 50]  # Customize column widths as needed
+        column_widths = [25, 40, 30, 30, 20, 50]  # Customize column widths as needed
 
         pdf.set_font("Arial", style="B", size=12)
         for header, width in zip(headers, column_widths):
@@ -31,12 +31,39 @@ def export_to_pdf(parent_widget, table):
         # Add table data
         pdf.set_font("Arial", size=10)
         row_count = table.rowCount()
+
         for row in range(row_count):
+            cell_data_list = []
+            max_lines = 0
+
+            # Collect data and calculate the max number of lines for the row
             for col, width in enumerate(column_widths):
                 item = table.item(row, col)
                 cell_data = item.text() if item else ""
-                pdf.cell(width, 10, cell_data, border=1)
-            pdf.ln()
+                cell_data_list.append(cell_data)
+
+                # Estimate the number of lines required for the cell
+                line_width = pdf.get_string_width(cell_data)
+                lines = (line_width // width) + 1
+                max_lines = max(max_lines, lines)
+
+            # Uniform row height
+            row_height = 5 * max_lines
+
+            # Write cells with uniform height
+            for col, width in enumerate(column_widths):
+                x = pdf.get_x()
+                y = pdf.get_y()
+                cell_data = cell_data_list[col]
+
+                # Draw the cell and set the uniform height
+                pdf.multi_cell(width, 5, cell_data, border=1, align="L")
+                
+                # Ensure all cells have the same height by moving the cursor to the correct next cell
+                pdf.set_xy(x + width, y)
+
+            # Move to the next row
+            pdf.ln(row_height)
 
         # Save the PDF to the chosen file path
         pdf.output(file_path)
