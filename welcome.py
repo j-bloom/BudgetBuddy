@@ -333,6 +333,11 @@ class MainWindow(QDialog):
         self.table.setRowCount(0)
         self.update_totals(self.current_table)
         self.load_table(self.current_table)
+        self.sourceSort.clear()
+        self.sourceSort.addItem("All")
+        self.sourceSort.addItems(self.get_unique_sources(self.current_table))
+        self.sourceSort.setCurrentText("All")
+
 
     def export_to_csv(self):
         export_to_csv(self.table, self)
