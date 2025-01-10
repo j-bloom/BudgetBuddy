@@ -61,6 +61,9 @@ class EditDialog(QDialog):
             if self.editCategoryDropdown.currentText() in ["--Select Option--", ""]:
                 raise ValueError("Please select a valid category!")
 
+            # Validate the fields and ensure all fields are populated
+            self.validate_fields()
+
             # Get the updated data
             updated_data = self.get_data()
 
@@ -132,3 +135,25 @@ class EditDialog(QDialog):
 
         except Exception as e:
             QMessageBox.critical(self, "Database Error", f"Failed to update record: {str(e)}")
+
+    def validate_fields(self):
+        """Ensure all fields and dropdowns are populated before proceeding."""
+        # Check if the source field is empty
+        if not self.editSourceEdit.text().strip():
+            raise ValueError("Source field cannot be empty!")
+
+        # Check if a valid category is selected
+        if self.editCategoryDropdown.currentText() in ["--Select Option--", ""]:
+            raise ValueError("Please select a valid category!")
+
+        # Check if a valid entry type is selected
+        if self.editEntryTypeDropdown.currentText() in ["--Select Option--", ""]:
+            raise ValueError("Please select a valid entry type!")
+
+        # Check if the amount is greater than 0
+        if self.editAmountSpinbox.value() <= 0:
+            raise ValueError("Amount must be greater than 0!")
+
+        # Check if the description field is empty
+        if not self.editDescriptionTextEdit.toPlainText().strip():
+            raise ValueError("Description field cannot be empty!")
