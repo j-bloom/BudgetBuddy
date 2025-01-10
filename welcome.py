@@ -430,17 +430,17 @@ class MainWindow(QDialog):
 
             # Check source filter
             source_item = self.table.item(row, 1)  # Source column index
-            if self.active_filters["source"] and (not source_item or source_item.text() != self.active_filters["source"]):
+            if self.active_filters["source"] and (not source_item or source_item.text().lower() != self.active_filters["source"].lower()):
                 show_row = False
 
             # Check category filter
             category_item = self.table.item(row, 2)  # Category column index
-            if self.active_filters["category"] and (not category_item or category_item.text() != self.active_filters["category"]):
+            if self.active_filters["category"] and (not category_item or category_item.text().lower() != self.active_filters["category"].lower()):
                 show_row = False
 
             # Check entry type filter
             entry_type_item = self.table.item(row, 3)  # Entry Type column index
-            if self.active_filters["entry_type"] and (not entry_type_item or entry_type_item.text() != self.active_filters["entry_type"]):
+            if self.active_filters["entry_type"] and (not entry_type_item or entry_type_item.text().lower() != self.active_filters["entry_type"].lower()):
                 show_row = False
 
             # Check amount filter
