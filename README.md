@@ -1,16 +1,27 @@
-# Budget Buddy
+# Budget Buddy v2
 
 ## How to run this application
 - Clone this repo into a directory/folder of your choosing. Preferably somewhere easy to access, run it in your favorite IDE and run the python app.
-- You can also use the link [here](https://drive.google.com/file/d/1mq85sGu0TQLGx-VoEKDfbaXUmsESClaO/view?usp=sharing) to access a Windows executable.
+  - You will need Tesseract OCR and pip installed
+
+# Versions
+### v2
+- You can also use the link [here](https://drive.google.com/file/d/1oe_4iHYdblln2cCQamoCkjvRXsqG8tAN/view?usp=drive_link) to access a Windows executable.
+
+### v1
+- v1 executable can be found [here](https://drive.google.com/file/d/1mq85sGu0TQLGx-VoEKDfbaXUmsESClaO/view?usp=sharing)
   
 *Currently the only options to run this app are an exe for Windows and the code being run through an IDE.
-  - If you would like to run this app on Linux or Mac, a third party application such as Wine would be necessary.  
+  - If you would like to run this app on Linux or Mac, a third party application such as Wine would be necessary.
+  - There are plans to compile the application to run on macOS 
 
 ## What does this app do?
 This is a budgeting application that allows users to enter their spending in several ways.  
 
-- Manually
+![Budget Buddy main screen](https://github.com/user-attachments/assets/cf104f60-a60b-42a3-8590-ed1ab5291ec5)
+
+### Populating budget tables
+#### Manually
   - User can manually enter information about a purchase including:
     - Date
     - Store
@@ -18,22 +29,42 @@ This is a budgeting application that allows users to enter their spending in sev
     - Entry Type (Expense/Income)
     - Price
     - Description of purchase
-      
-![expense page](https://github.com/user-attachments/assets/35d879f9-1ab7-4104-a828-1e5b1e6d4508)
-![income page](https://github.com/user-attachments/assets/c0a37698-b2ac-49e0-8a73-b144d65c0d79)
 
-- Importing a screenshot of the budget
-  - If a user has created an entry on a mobile device, they can send it to themselves and import that screenshot  
-  <img src="https://github.com/user-attachments/assets/339f92f9-19f2-4170-9f09-56b8739cab28" width="300" height="600" />)
+  - Dialog for Income/Expense/Edit are all similar. The major differences in them are the categories in the "Category" dropdown
+      ![Budget Buddy entry dialog](https://github.com/user-attachments/assets/18979dbe-ca82-4e0d-8dbf-de84ac035151)
+      ![Budget Buddy current month table](https://github.com/user-attachments/assets/34a78f86-5c32-48ed-8185-cf6f9aecb5a0)
 
-  ![screenshot import](https://github.com/user-attachments/assets/5634e385-6d96-474e-b8b8-ea09dc2787da)
+#### Importing/Exporting
+  - CSV 
+    - If a user has a budget that they have started in a CSV file, they can import that budget into the current months budget.
+    - If a user has the need to share their budget they have the ability to Export the current months budget to a CSV file they can then upload or send to another person.
 
-- Importing/Exporting CSV
-  - If a user has a budget that they have started in a CSV file, they can import that budget into the current months budget.
-  - If a user has the need to share their budget they have the ability to Export the current months budget to a CSV file they can then upload or send to another person.
-![export test](https://github.com/user-attachments/assets/6c809940-c03f-4bae-b57e-00ff624c2917)
+  - PDF
+    - If a user needs to share a monthly budget with someone and requires that the file cannot be modified, the budget can be exported as a PDF.
 
-![export test 2](https://github.com/user-attachments/assets/5cd5621c-4c84-4523-8f8b-dd887ede52f3)
+  - Screenshots
+    - If a user has created an entry on a mobile device, they can send it to themselves and import that screenshot  
+    <img src="https://github.com/user-attachments/assets/339f92f9-19f2-4170-9f09-56b8739cab28" width="300" height="600" />)
+
+### Multiple Table View
+- Multiple tables can be created
+  - Users have the option to view previous budgets from prior months.
+  - Previous budgets can still be modified and exported if needed
+  
+![Budget Buddy table search dialog](https://github.com/user-attachments/assets/8c09201b-5da0-4532-b1db-90f5a66cb729)
+
+## Improvements from v1
+- Simpler design
+  - Income and Expenses are now dialogs rather than their own screens
+- Improved sharing
+  - Users can now export to a PDF for creating a unmodifiable file
+- Better User Experience
+  - Users can now create mutliple tables for each month, resulting in better orginization of monthly budgets
+  - New tables get dynamically created for the user each month the first time the application is run, resulting in efficiency for the user
+  - Users can now edit entries
+  - Users can now duplicate entries
+  - Filters to navigate table, resulting in time saving searches
+
 
 ## Why this app?
 I wrote this application because I wanted to experiment with technologies I haven't had a chance to use, specifically <b>Optical Character Recognition (OCR)</b>.  
