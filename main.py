@@ -19,7 +19,8 @@ class BudgetBuddyApp(QWidget):
         self.functions = Functions(self.main_window, self.db)
 
         self.main_window.add_expense_btn.clicked.connect(self.functions.open_add_expense_dialog)
-        self.main_window.delete_entry_btn.clicked.connect(self.db.delete_expense)
+        self.main_window.add_income_btn.clicked.connect(self.functions.open_add_income_dialog)
+        self.main_window.delete_entry_btn.clicked.connect(self.db.delete_entry)
 
         # Add main_window to this widget's layout
         layout = QVBoxLayout()
