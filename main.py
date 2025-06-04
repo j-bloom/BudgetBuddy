@@ -16,8 +16,8 @@ class BudgetBuddyApp(QWidget):
         self.main_window = MainWindow()
         self.db = Database(self.main_window)
 
-        self.main_window.add_btn.clicked.connect(self.db.add_expense)
-        self.main_window.delete_btn.clicked.connect(self.db.delete_expense)
+        self.main_window.add_expense_btn.clicked.connect(self.db.add_expense)
+        self.main_window.delete_entry_btn.clicked.connect(self.db.delete_expense)
 
         # Add main_window to this widget's layout
         layout = QVBoxLayout()
