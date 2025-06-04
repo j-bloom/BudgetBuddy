@@ -1,26 +1,34 @@
-"""
-Import necessary modules to build the GUI
-and run the application
-"""
 import sys
-from PyQt5.QtWidgets import QApplication, QMessageBox
-from welcome import MainWindow
-from PyQt5.QtSql import QSqlDatabase
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushButton, QComboBox, QHBoxLayout, QVBoxLayout, QDateEdit, QTableWidget, QMessageBox, QTableWidgetItem
+from PyQt5.QtCore import QDate
+from PyQt5.QtSql import QSqlDatabase, QSqlQuery
+from ui.main_window import MainWindow
+from database.database import Database
 
-"""
-Create the database 
-"""
-database = QSqlDatabase.addDatabase("QSQLITE")
-database.setDatabaseName("budget.db")
+# App Class
+class BudgetBuddyApp(QWidget):
+    def __init__(self):
+        # Main App Objects and Settings
+        super().__init__()
+        self.setWindowTitle("Budget Tracker 2.0")
+        self.resize(550, 500)
 
-if not database.open():
-    QMessageBox.critical(None, "Error", "Could not connect to your database")
-    sys.exit(1)
+        self.main_window = MainWindow()
+        self.db = Database(self.main_window)
 
+        self.main_window.add_btn.clicked.connect(self.db.add_expense)
+        self.main_window.delete_btn.clicked.connect(self.db.delete_expense)
 
-# Create an instance of QApplication and run the application
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    window = MainWindow()
-    window.show()
-    sys.exit(app.exec_())
+        # Add main_window to this widget's layout
+        layout = QVBoxLayout()
+        layout.addWidget(self.main_window)
+        self.setLayout(layout)
+
+        self.db.load_table()
+
+# Show/Run our App
+if __name__ in "__main__":
+    app = QApplication([])
+    main = BudgetBuddyApp()
+    main.show()
+    app.exec_() 
