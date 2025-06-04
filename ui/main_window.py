@@ -1,5 +1,9 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushButton, QComboBox, QHBoxLayout, QVBoxLayout, QGridLayout, QDateEdit, QTableWidget, QMessageBox, QTableWidgetItem, QHeaderView, QDoubleSpinBox
+from PyQt5.QtWidgets import (
+    QApplication, QWidget, QLabel, QLineEdit, QPushButton, QComboBox, QHBoxLayout,
+    QVBoxLayout, QGridLayout, QDateEdit, QTableWidget, QMessageBox, QTableWidgetItem,
+    QHeaderView, QDoubleSpinBox
+)
 from PyQt5.QtCore import QDate
 from PyQt5.QtSql import QSqlDatabase, QSqlQuery
 from PyQt5.QtGui import QFont
@@ -8,7 +12,6 @@ from PyQt5.QtGui import QFont
 class MainWindow(QWidget): 
     def __init__(self):
         super().__init__()
-
         self.create_main_ui()
 
     def create_main_ui(self):
@@ -59,11 +62,11 @@ class MainWindow(QWidget):
         # Table Displaying monthly budgets
         # Add extra column for hidden ID used internally
         self.table = QTableWidget()
-        self.table.setColumnCount(6)  # add 6th column for Entry Type
-        header_names = ["Date", "Store", "Entry Type", "Category", "Amount", "Description"]
+        self.table.setColumnCount(7)  # ✅ updated to 7 columns (including ID)
+        header_names = ["ID", "Date", "Store/Source", "Entry Type", "Category", "Amount", "Description"]
         self.table.setHorizontalHeaderLabels(header_names)
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.table.setColumnHidden(0, True)  # Hide ID column from user
+        self.table.setColumnHidden(0, True)  # ✅ Hide ID column from user
 
         # Layouts
         self.master_layout = QHBoxLayout()

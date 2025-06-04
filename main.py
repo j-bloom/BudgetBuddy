@@ -4,6 +4,7 @@ from PyQt5.QtCore import QDate
 from PyQt5.QtSql import QSqlDatabase, QSqlQuery
 from ui.main_window import MainWindow
 from database.database import Database
+from controllers.functions import Functions
 
 # App Class
 class BudgetBuddyApp(QWidget):
@@ -15,8 +16,9 @@ class BudgetBuddyApp(QWidget):
 
         self.main_window = MainWindow()
         self.db = Database(self.main_window)
+        self.functions = Functions(self.main_window, self.db)
 
-        self.main_window.add_expense_btn.clicked.connect(self.db.add_expense)
+        self.main_window.add_expense_btn.clicked.connect(self.functions.open_add_expense_dialog)
         self.main_window.delete_entry_btn.clicked.connect(self.db.delete_expense)
 
         # Add main_window to this widget's layout
