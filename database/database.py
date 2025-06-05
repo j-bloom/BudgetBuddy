@@ -68,6 +68,8 @@ class Database:
 
             row += 1
 
+        self.update_totals()
+
 
     def insert_expense(self, data):
         self._insert_entry(data)
@@ -187,3 +189,21 @@ class Database:
         if query.exec_() and query.next():
             return query.value(0) > 0
         return False
+
+    def update_totals(self):
+        """Updates the total income and expense labels on the main window."""
+        total_income = 0.0
+        total_expense = 0.0
+
+        query = QSqlQuery(f'SELECT entry_type, amount FROM "{self.current_table}"')
+        while query.next():
+            entry_type = query.value(0)
+            amount = query.value(1)
+
+            if entry_type == "income":
+                total_income += float(amount)
+            elif entry_type == "expense":
+                total_expense += float(amount)
+
+        self.main_window.total_income_amount_label.setText(f"${total_income:.2f}")
+        self.main_window.total_expense_amount_label.setText(f"${total_expense:.2f}")
