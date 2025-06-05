@@ -4,6 +4,8 @@ from ui.add_income_dialog import AddIncomeDialog
 from ui.edit_entry_dialog import EditEntryDialog
 from ui.table_search_dialog import TableSearchDialog
 from datetime import datetime
+from controllers.pdf import export_to_pdf
+from controllers.csv import export_to_csv, import_from_csv
 
 class Functions:
     def __init__(self, main_window, db):
@@ -123,3 +125,13 @@ class Functions:
             selected_table = dialog.get_selected_table()
             if selected_table:
                 self.db.load_table(table_name=selected_table)
+
+    def handle_export_pdf(self):
+        export_to_pdf(self.db.current_table)
+
+    def handle_export_csv(self):
+        export_to_csv(self.main_window.table, self.main_window)
+
+    def handle_import_csv(self):
+        import_from_csv(self.main_window.table, self.main_window, self.db.current_table)
+        self.db.load_table()
