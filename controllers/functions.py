@@ -1,11 +1,13 @@
-from PyQt5.QtWidgets import QTableWidgetItem, QMessageBox
+from PyQt5.QtWidgets import QTableWidgetItem, QMessageBox, QFileDialog
 from ui.add_expense_dialog import AddExpenseDialog
 from ui.add_income_dialog import AddIncomeDialog
 from ui.edit_entry_dialog import EditEntryDialog
 from ui.table_search_dialog import TableSearchDialog
 from datetime import datetime
+import pytesseract
 from controllers.pdf import export_to_pdf
 from controllers.csv import export_to_csv, import_from_csv
+import controllers.ocr
 
 class Functions:
     def __init__(self, main_window, db):
@@ -134,4 +136,26 @@ class Functions:
 
     def handle_import_csv(self):
         import_from_csv(self.main_window.table, self.main_window, self.db.current_table)
+        self.db.load_table()
+
+    def handle_import_screenshot(self):
+        pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'  # Update if needed
+
+        file_path, _ = QFileDialog.getOpenFileName(
+            self.main_window,
+            "Select Image",
+            "",
+            "Image Files (*.png *.PNG *.jpg *JPG *.jpeg *JPEG *.bmp)"
+        )
+
+        if not file_path:
+            return
+
+        # Determine the current month's table name
+        current_month = self.db.current_table or datetime.now().strftime("%Y_%m")
+
+        # Run OCR and insert entries
+        controllers.ocr.process_ocr_and_insert(file_path, current_month)
+
+        # Refresh the table
         self.db.load_table()

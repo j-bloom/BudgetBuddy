@@ -21,6 +21,7 @@ class BudgetBuddyApp(QWidget):
         self.main_window.export_pdf.clicked.connect(self.functions.handle_export_pdf)
         self.main_window.export_csv.clicked.connect(self.functions.handle_export_csv)
         self.main_window.import_csv.clicked.connect(self.functions.handle_import_csv)
+        self.main_window.import_screenshot.clicked.connect(self.functions.handle_import_screenshot)
 
         self.main_window.view_month_btn.clicked.connect(self.functions.open_table_search_dialog)
         self.main_window.add_expense_btn.clicked.connect(self.functions.open_add_expense_dialog)
