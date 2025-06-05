@@ -20,6 +20,8 @@ class BudgetBuddyApp(QWidget):
 
         self.main_window.add_expense_btn.clicked.connect(self.functions.open_add_expense_dialog)
         self.main_window.add_income_btn.clicked.connect(self.functions.open_add_income_dialog)
+        self.main_window.edit_entry_btn.clicked.connect(self.functions.open_edit_dialog)
+        self.main_window.duplicate_entry_btn.clicked.connect(self.functions.duplicate_selected_entry)
         self.main_window.delete_entry_btn.clicked.connect(self.db.delete_entry)
 
         # Add main_window to this widget's layout

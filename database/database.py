@@ -108,6 +108,46 @@ class Database:
             "description": description
         })
 
+    def update_entry(self, data, check_only=False):
+        if check_only:
+            # Don't match on the current ID
+            query = QSqlQuery()
+            query.prepare(f"""
+                SELECT COUNT(*) FROM "{self.current_table}"
+                WHERE date = ? AND source = ? AND entry_type = ? AND category = ? AND amount = ? AND description = ?
+                AND id != ?
+            """)
+            query.addBindValue(data["date"])
+            query.addBindValue(data["store"])
+            query.addBindValue(data["entry_type"])
+            query.addBindValue(data["category"])
+            query.addBindValue(data["amount"])
+            query.addBindValue(data["description"])
+            query.addBindValue(data["id"])
+            if query.exec_() and query.next():
+                return query.value(0) > 0
+            return False
+
+        # Normal update
+        query = QSqlQuery()
+        query.prepare(f"""
+            UPDATE "{self.current_table}"
+            SET date = ?, source = ?, entry_type = ?, category = ?, amount = ?, description = ?
+            WHERE id = ?
+        """)
+        query.addBindValue(data["date"])
+        query.addBindValue(data["store"])
+        query.addBindValue(data["entry_type"])
+        query.addBindValue(data["category"])
+        query.addBindValue(data["amount"])
+        query.addBindValue(data["description"])
+        query.addBindValue(data["id"])
+
+        if not query.exec_():
+            QMessageBox.critical(None, "Database Error", f"Failed to update entry:\n{query.lastError().text()}")
+        else:
+            self.load_table()
+
     def delete_entry(self):
         """Deletes selected entry (expense or income)."""
         selected_row = self.main_window.table.currentRow()
@@ -126,3 +166,20 @@ class Database:
         query.addBindValue(entry_id)
         query.exec_()
         self.load_table()
+
+    def check_duplicate_entry(self, data):
+        query = QSqlQuery()
+        query.prepare(f"""
+            SELECT COUNT(*) FROM "{self.current_table}"
+            WHERE date = ? AND source = ? AND entry_type = ? AND category = ? AND amount = ? AND description = ?
+        """)
+        query.addBindValue(data["date"])
+        query.addBindValue(data["store"])
+        query.addBindValue(data["entry_type"])
+        query.addBindValue(data["category"])
+        query.addBindValue(data["amount"])
+        query.addBindValue(data["description"])
+
+        if query.exec_() and query.next():
+            return query.value(0) > 0
+        return False
