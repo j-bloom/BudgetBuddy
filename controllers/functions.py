@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QTableWidgetItem, QMessageBox
 from ui.add_expense_dialog import AddExpenseDialog
 from ui.add_income_dialog import AddIncomeDialog
 from ui.edit_entry_dialog import EditEntryDialog
+from ui.table_search_dialog import TableSearchDialog
 from datetime import datetime
 
 class Functions:
@@ -42,28 +43,31 @@ class Functions:
     def handle_add_expense_submit(self, data):
         if self.db.check_duplicate_entry(data):
             response = QMessageBox.question(
-            None,
-            "Duplicate Entry",
-            "An identical expense already exists. Do you want to add it anyway?",
-            QMessageBox.Yes | QMessageBox.No
-        )
-        if response == QMessageBox.No:
-            self.dialog.reject()
-            return
+                None,
+                "Duplicate Entry",
+                "An identical expense already exists. Do you want to add it anyway?",
+                QMessageBox.Yes | QMessageBox.No
+            )
+            if response == QMessageBox.No:
+                self.dialog.reject()
+                return
+
         self.db.insert_expense(data)
         self.db.load_table()
+
 
     def handle_add_income_submit(self, data):
         if self.db.check_duplicate_entry(data):
             response = QMessageBox.question(
-            None,
-            "Duplicate Entry",
-            "An identical income entry already exists. Do you want to add it anyway?",
-            QMessageBox.Yes | QMessageBox.No
-        )
-        if response == QMessageBox.No:
-            self.dialog.reject()
-            return
+                None,
+                "Duplicate Entry",
+                "An identical income entry already exists. Do you want to add it anyway?",
+                QMessageBox.Yes | QMessageBox.No
+            )
+            if response == QMessageBox.No:
+                self.dialog.reject()
+                return
+
         self.db.insert_income(data)
         self.db.load_table()
 
@@ -112,3 +116,10 @@ class Functions:
             self.db.insert_expense(data)
 
         self.db.load_table()
+
+    def open_table_search_dialog(self):
+        dialog = TableSearchDialog(self.db)
+        if dialog.exec_():
+            selected_table = dialog.get_selected_table()
+            if selected_table:
+                self.db.load_table(table_name=selected_table)

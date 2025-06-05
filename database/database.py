@@ -39,14 +39,17 @@ class Database:
             )
         """)
 
-    def load_table(self):
-        """Loads the entries from the current monthly table into the UI table."""
+    def load_table(self, table_name=None):
+        """Loads entries from the current or specified monthly table into the UI table."""
+        if table_name:
+            self.current_table = table_name
+
         self.main_window.table.setRowCount(0)
 
         query = QSqlQuery(f"""SELECT * FROM "{self.current_table}" """)
         row = 0
         while query.next():
-            entry_id = query.value(0)
+            expense_id = query.value(0)
             date = query.value(1)
             source = query.value(2)
             entry_type = query.value(3)
@@ -55,7 +58,7 @@ class Database:
             description = query.value(6)
 
             self.main_window.table.insertRow(row)
-            self.main_window.table.setItem(row, 0, QTableWidgetItem(str(entry_id)))
+            self.main_window.table.setItem(row, 0, QTableWidgetItem(str(expense_id)))
             self.main_window.table.setItem(row, 1, QTableWidgetItem(date))
             self.main_window.table.setItem(row, 2, QTableWidgetItem(source))
             self.main_window.table.setItem(row, 3, QTableWidgetItem(entry_type))
@@ -64,6 +67,7 @@ class Database:
             self.main_window.table.setItem(row, 6, QTableWidgetItem(description))
 
             row += 1
+
 
     def insert_expense(self, data):
         self._insert_entry(data)
