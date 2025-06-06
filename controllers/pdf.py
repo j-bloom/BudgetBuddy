@@ -1,73 +1,55 @@
-from fpdf import FPDF
-from PyQt5.QtWidgets import QMessageBox, QFileDialog
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
+from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtSql import QSqlQuery
+import os
 
-def export_to_pdf(parent_widget, table):
-    # Open file dialog to choose where to save the PDF
-    file_path, _ = QFileDialog.getSaveFileName(parent_widget, "Export to PDF", "", "PDF Files (*.pdf);;All Files (*)")
-    if not file_path:
-        return  # User canceled the dialog
+def export_to_pdf(table_name: str, output_path: str = None):
+    """Exports a given table from the DB to PDF."""
+    if not output_path:
+        output_path = f"{table_name}.pdf"
+
+    doc = SimpleDocTemplate(output_path, pagesize=letter)
+    elements = []
+    styles = getSampleStyleSheet()
+
+    # Title
+    elements.append(Paragraph(f"Budget Table: {table_name}", styles['Title']))
+    elements.append(Spacer(1, 12))
+
+    # Header and data
+    headers = ["Date", "Source", "Entry Type", "Category", "Amount", "Description"]
+    data = [headers]
+
+    query = QSqlQuery(f'SELECT * FROM "{table_name}"')
+    while query.next():
+        row = [
+            query.value(1),
+            query.value(2),
+            query.value(3),
+            query.value(4),
+            f"${query.value(5):.2f}",
+            query.value(6),
+        ]
+        row = [Paragraph(str(cell), styles['BodyText']) for cell in row]
+        data.append(row)
+
+    table = Table(data, repeatRows=1)
+    table.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, 0), colors.lightblue),
+        ("TEXTCOLOR", (0, 0), (-1, 0), colors.black),
+        ("GRID", (0, 0), (-1, -1), 0.5, colors.black),
+        ("FONTNAME", (0, 0), (-1, -1), "Helvetica"),
+        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ("ALIGN", (0, 0), (-1, 0), "CENTER"),
+    ]))
+
+    elements.append(table)
 
     try:
-        # Create a PDF object
-        pdf = FPDF()
-        pdf.set_auto_page_break(auto=True, margin=15)
-        pdf.add_page()
-        pdf.set_font("Arial", size=12)
-
-        # Add title
-        pdf.set_font("Arial", style="B", size=14)
-        pdf.cell(200, 10, txt="Budget Buddy Report", ln=True, align="C")
-        pdf.ln(10)  # Add a line break
-
-        # Add table headers
-        headers = ["Date", "Source", "Category", "Entry Type", "Amount", "Description"]
-        column_widths = [25, 40, 30, 30, 20, 50]  # Customize column widths as needed
-
-        pdf.set_font("Arial", style="B", size=12)
-        for header, width in zip(headers, column_widths):
-            pdf.cell(width, 10, header, border=1, align="C")
-        pdf.ln()
-
-        # Add table data
-        pdf.set_font("Arial", size=10)
-        row_count = table.rowCount()
-
-        for row in range(row_count):
-            cell_data_list = []
-            max_lines = 0
-
-            # Collect data and calculate the max number of lines for the row
-            for col, width in enumerate(column_widths):
-                item = table.item(row, col)
-                cell_data = item.text() if item else ""
-                cell_data_list.append(cell_data)
-
-                # Estimate the number of lines required for the cell
-                line_width = pdf.get_string_width(cell_data)
-                lines = (line_width // width) + 1
-                max_lines = max(max_lines, lines)
-
-            # Uniform row height
-            row_height = 5 * max_lines
-
-            # Write cells with uniform height
-            for col, width in enumerate(column_widths):
-                x = pdf.get_x()
-                y = pdf.get_y()
-                cell_data = cell_data_list[col]
-
-                # Draw the cell and set the uniform height
-                pdf.multi_cell(width, 5, cell_data, border=1, align="L")
-                
-                # Ensure all cells have the same height by moving the cursor to the correct next cell
-                pdf.set_xy(x + width, y)
-
-            # Move to the next row
-            pdf.ln(row_height)
-
-        # Save the PDF to the chosen file path
-        pdf.output(file_path)
-        QMessageBox.information(parent_widget, "Export Successful", f"Data exported successfully to {file_path}")
+        doc.build(elements)
+        QMessageBox.information(None, "Export Successful", f"PDF saved: {os.path.abspath(output_path)}")
     except Exception as e:
-        # Handle exceptions (e.g., file saving issues, PDF creation problems)
-        QMessageBox.warning(parent_widget, "Export Failed", f"Failed to export data to PDF: {str(e)}")
+        QMessageBox.critical(None, "Export Failed", f"Error generating PDF: {str(e)}")
