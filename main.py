@@ -30,6 +30,9 @@ class BudgetBuddyApp(QWidget):
         self.main_window.duplicate_entry_btn.clicked.connect(self.functions.duplicate_selected_entry)
         self.main_window.delete_entry_btn.clicked.connect(self.db.delete_entry)
 
+        self.main_window.filter_search.textChanged.connect(self.functions.filter_table)
+        
+
         # Add main_window to this widget's layout
         layout = QVBoxLayout()
         layout.addWidget(self.main_window)

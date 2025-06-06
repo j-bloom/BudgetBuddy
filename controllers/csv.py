@@ -45,17 +45,17 @@ def import_from_csv(table, parent_widget, current_month):
             
             query = QSqlQuery()
             for row in reader:
-                date, source, category, entry_type, amount, description = row
+                date, source,entry_type, category, amount, description = row
                 
                 query.prepare(f"""
-                    INSERT INTO '{current_month}' (date, source, category, entry_type, amount, description) 
-                    VALUES (:date, :source, :category, :entry_type, :amount, :description)
+                    INSERT INTO '{current_month}' (date, source, entry_type, category, amount, description) 
+                    VALUES (:date, :source, :entry_type, :category, :amount, :description)
                 """)
                 
                 query.addBindValue(date)
                 query.addBindValue(source)
-                query.addBindValue(category)
                 query.addBindValue(entry_type)
+                query.addBindValue(category)
                 query.addBindValue(float(amount))  # Convert amount to float
                 query.addBindValue(description)
                 

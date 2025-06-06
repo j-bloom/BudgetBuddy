@@ -8,6 +8,7 @@ import pytesseract
 from controllers.pdf import export_to_pdf
 from controllers.csv import export_to_csv, import_from_csv
 import controllers.ocr
+from difflib import SequenceMatcher
 
 class Functions:
     def __init__(self, main_window, db):
@@ -159,3 +160,49 @@ class Functions:
 
         # Refresh the table
         self.db.load_table()
+
+    def clear_filters(self):
+        # Reset text-based filters
+        self.active_filters = {
+            "source": None,
+            "category": None,
+            "entry_type": None,
+            "min_amount": None,
+            "max_amount": None,
+            "description": None
+        }
+
+        self.searchFilterInput.setText("")
+        self.descriptionSort.setText("")
+        self.sourceSort.setCurrentIndex(0)
+        self.categorySort.setCurrentIndex(0)
+        self.entryTypeSort.setCurrentIndex(0)
+
+        self.min_spinbox.setValue(0.00)
+        self.max_spinbox.setValue(0.00)
+
+        self.apply_all_filters()
+
+        self.reload_table()
+
+    def filter_table(self):
+        search_text = self.main_window.filter_search.text().strip().lower()
+        
+        if not search_text:
+            # If search box is cleared, show all rows
+            for row in range(self.main_window.table.rowCount()):
+                self.main_window.table.setRowHidden(row, False)
+            return
+        
+        for row in range(self.main_window.table.rowCount()):
+            row_match = False
+            for col in range(self.main_window.table.columnCount()):
+                cell_text = self.main_window.table.item(row, col).text().lower() if self.main_window.table.item(row, col) else ""
+                
+                similarity = SequenceMatcher(None, search_text, cell_text).ratio()
+                
+                if search_text in cell_text or similarity > 0.7:
+                    row_match = True
+                    break
+            
+            self.main_window.table.setRowHidden(row, not row_match)
