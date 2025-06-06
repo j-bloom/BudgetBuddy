@@ -30,7 +30,7 @@ class AddIncomeDialog(QDialog):
         self.amount_spinbox.setDecimals(2)
         self.description_text = QTextEdit()
 
-        self.category_dropdown.addItems(["Salary", "Bonus", "Freelance"])
+        self.category_dropdown.addItems(["Paycheck", "Bonus", "Freelance", "Investments", "Gift"])
 
         form_grid = QGridLayout()
         form_grid.addWidget(QLabel("Date"), 0, 0)

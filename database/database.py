@@ -207,3 +207,15 @@ class Database:
 
         self.main_window.total_income_amount_label.setText(f"${total_income:.2f}")
         self.main_window.total_expense_amount_label.setText(f"${total_expense:.2f}")
+
+    """
+    Get unique sources for the selected month and populate the source dropdown menu
+    """
+    def get_unique_sources(self):
+        sources = []
+        query = QSqlQuery()
+        query.exec_(f"SELECT DISTINCT source FROM '{self.current_table}'")
+        while query.next():
+            sources.append(query.value(0))
+        return sources
+    

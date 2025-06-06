@@ -16,6 +16,15 @@ class Functions:
         self.db = db
         self.dialog = None
 
+        self.active_filters = {
+            "source": None,
+            "category": None,
+            "entry_type": None,
+            "min_amount": None,
+            "max_amount": None,
+            "description": None
+        }
+
     def open_add_expense_dialog(self):
         self.dialog = AddExpenseDialog(on_submit_callback=self.handle_add_expense_submit)
         self.dialog.setWindowModality(True)
@@ -172,18 +181,45 @@ class Functions:
             "description": None
         }
 
-        self.searchFilterInput.setText("")
-        self.descriptionSort.setText("")
-        self.sourceSort.setCurrentIndex(0)
-        self.categorySort.setCurrentIndex(0)
-        self.entryTypeSort.setCurrentIndex(0)
+        self.main_window.filter_search.setText("")
+        self.main_window.description_input.setText("")
+        self.main_window.source_dropdown.setCurrentIndex(0)
+        self.main_window.entry_type_dropdown.setCurrentIndex(0)
+        self.main_window.category_dropdown.setCurrentIndex(0)
 
-        self.min_spinbox.setValue(0.00)
-        self.max_spinbox.setValue(0.00)
+        self.main_window.min_amount_spinbox.setValue(0.00)
+        self.main_window.max_amount_spinbox.setValue(0.00)
 
         self.apply_all_filters()
 
-        self.reload_table()
+        self.db.load_table()
+
+    def filter_by_source(self, selected_source):
+        self.active_filters["source"] = None if selected_source == "All" else selected_source
+        self.apply_all_filters()
+
+    def filter_by_entry_type(self, selected_entry_type):
+        self.active_filters["entry_type"] = None if selected_entry_type == "All" else selected_entry_type
+        self.apply_all_filters()
+
+    def filter_by_category(self, selected_category):
+        self.active_filters["category"] = None if selected_category == "All" else selected_category
+        self.apply_all_filters()
+
+    def apply_numeric_filter(self):
+        min_value = self.main_window.min_amount_spinbox.value()
+        max_value = self.main_window.max_amount_spinbox.value()
+        self.filter_by_amount(min_value, max_value)
+
+    def filter_by_amount(self, min_value, max_value):
+        self.active_filters["min_amount"] = min_value
+        self.active_filters["max_amount"] = max_value
+        self.apply_all_filters()
+
+    def filter_by_description(self):
+        filter_text = self.main_window.description_input.text().strip().lower()
+        self.active_filters["description"] = None if not filter_text else filter_text
+        self.apply_all_filters()
 
     def filter_table(self):
         search_text = self.main_window.filter_search.text().strip().lower()
@@ -206,3 +242,46 @@ class Functions:
                     break
             
             self.main_window.table.setRowHidden(row, not row_match)
+
+    def apply_all_filters(self):
+        for row in range(self.main_window.table.rowCount()):
+            show_row = True
+
+            # Check source filter
+            source_item = self.main_window.table.item(row, 2)  # Source column index
+            if self.active_filters["source"] and (not source_item or source_item.text().lower() != self.active_filters["source"].lower()):
+                show_row = False
+
+            # Check entry type filter
+            entry_type_item = self.main_window.table.item(row, 3)  # Entry Type column index
+            if self.active_filters["entry_type"] and (not entry_type_item or entry_type_item.text().lower() != self.active_filters["entry_type"].lower()):
+                show_row = False
+
+            # Check category filter
+            category_item = self.main_window.table.item(row, 4)  # Category column index
+            if self.active_filters["category"] and (not category_item or category_item.text().lower() != self.active_filters["category"].lower()):
+                show_row = False
+            
+            # Check amount filter
+            amount_item = self.main_window.table.item(row, 5)  # Amount column index
+            if amount_item:
+                try:
+                    amount_value = float(amount_item.text())
+                    if self.active_filters["min_amount"] and amount_value < self.active_filters["min_amount"]:
+                        show_row = False
+                    if self.active_filters["max_amount"] and amount_value > self.active_filters["max_amount"]:
+                        show_row = False
+                except ValueError:
+                    show_row = False
+            elif self.active_filters["min_amount"] or self.active_filters["max_amount"]:
+                show_row = False
+
+            # Check description filter
+            description_item = self.main_window.table.item(row, 6)  # Description column index
+            if self.active_filters["description"]:
+                description_text = description_item.text().strip().lower() if description_item else ""
+                if self.active_filters["description"] not in description_text:
+                    show_row = False
+        
+            # Show or hide row based on all filters
+            self.main_window.table.setRowHidden(row, not show_row)

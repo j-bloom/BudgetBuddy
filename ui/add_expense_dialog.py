@@ -27,7 +27,7 @@ class AddExpenseDialog(QDialog):
         self.amount_spinbox.setDecimals(2)
         self.description_text = QTextEdit()
 
-        self.category_dropdown.addItems(["Groceries", "Bills", "Transport"])
+        self.category_dropdown.addItems(["Groceries", "Bills", "Transportion", "Gas", "Car maintenance"])
 
         form_grid = QGridLayout()
         form_grid.addWidget(QLabel("Date"), 0, 0)

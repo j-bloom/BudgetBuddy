@@ -30,8 +30,28 @@ class BudgetBuddyApp(QWidget):
         self.main_window.duplicate_entry_btn.clicked.connect(self.functions.duplicate_selected_entry)
         self.main_window.delete_entry_btn.clicked.connect(self.db.delete_entry)
 
-        self.main_window.filter_search.textChanged.connect(self.functions.filter_table)
         
+        self.main_window.source_dropdown.addItem("All")
+        self.main_window.source_dropdown.addItems(self.db.get_unique_sources())
+
+        self.main_window.source_dropdown.setCurrentText("All")
+        self.main_window.source_dropdown.currentTextChanged.connect(self.functions.filter_by_source)
+
+        self.main_window.entry_type_dropdown.addItems(["All", "Expense", "Income"])
+
+        self.main_window.entry_type_dropdown.setCurrentText("All")
+        self.main_window.entry_type_dropdown.currentTextChanged.connect(self.functions.filter_by_entry_type)
+
+        self.main_window.category_dropdown.addItems(["All", "Groceries", "Bills", "Transportion", "Gas", "Car maintenance", "Rent", "Pets", "Salary", "Bonus", "Freelance", "Investments", "Gift"])
+        self.main_window.category_dropdown.currentTextChanged.connect(self.functions.filter_by_category)
+
+        self.main_window.min_amount_spinbox.valueChanged.connect(self.functions.apply_numeric_filter)
+        self.main_window.max_amount_spinbox.valueChanged.connect(self.functions.apply_numeric_filter)
+
+        self.main_window.description_input.textChanged.connect(self.functions.filter_by_description)
+
+        self.main_window.filter_search.textChanged.connect(self.functions.filter_table)
+        self.main_window.clear_filter_btn.clicked.connect(self.functions.clear_filters)
 
         # Add main_window to this widget's layout
         layout = QVBoxLayout()

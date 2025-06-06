@@ -107,16 +107,16 @@ class MainWindow(QWidget):
         # Grid layout
         labels = [
             self.source_label,
-            self.category_label,
             self.entry_type_label,
+            self.category_label,
             self.min_amount_label,
             self.max_amount_label,
             self.description_label
         ]
         widgets = [
             self.source_dropdown,
-            self.category_dropdown,
             self.entry_type_dropdown,
+            self.category_dropdown,
             self.min_amount_spinbox,
             self.max_amount_spinbox,
             self.description_input
