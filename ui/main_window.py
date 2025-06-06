@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import (
     QVBoxLayout, QGridLayout, QDateEdit, QTableWidget, QMessageBox, QTableWidgetItem,
     QHeaderView, QDoubleSpinBox
 )
-from PyQt5.QtCore import QDate
+from PyQt5.QtCore import QDate, Qt
 from PyQt5.QtSql import QSqlDatabase, QSqlQuery
 from PyQt5.QtGui import QFont
 
@@ -68,6 +68,10 @@ class MainWindow(QWidget):
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.table.setColumnHidden(0, True)  # ✅ Hide ID column from user
 
+        self.table_note = QLabel("Tip: If a description is too long, double-click thes description to view the full text.")
+        self.table_note.setStyleSheet("color: gray; font-style: italic; font-size: 11px;")
+        self.table_note.setAlignment(Qt.AlignRight)
+
         # Layouts
         self.master_layout = QHBoxLayout()
         self.col1 = QVBoxLayout()
@@ -130,6 +134,7 @@ class MainWindow(QWidget):
         self.filter_layout.addLayout(self.grid_filter)
 
         self.col2.addLayout(self.filter_layout)
+        self.col2.addWidget(self.table_note)
         self.col2.addWidget(self.table)
 
         self.master_layout.addLayout(self.col1)

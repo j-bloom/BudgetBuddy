@@ -1,8 +1,9 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushButton, QComboBox, QHBoxLayout, QVBoxLayout, QDateEdit, QTableWidget, QMessageBox, QTableWidgetItem
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushButton, QComboBox, QHBoxLayout, QAbstractItemView, QVBoxLayout, QDateEdit, QTableWidget, QMessageBox, QTableWidgetItem
 from PyQt5.QtCore import QDate
 from PyQt5.QtSql import QSqlDatabase, QSqlQuery
 from ui.main_window import MainWindow
+
 from database.database import Database
 from controllers.functions import Functions
 
@@ -49,6 +50,8 @@ class BudgetBuddyApp(QWidget):
         self.main_window.max_amount_spinbox.valueChanged.connect(self.functions.apply_numeric_filter)
 
         self.main_window.description_input.textChanged.connect(self.functions.filter_by_description)
+        self.main_window.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.main_window.table.cellDoubleClicked.connect(self.functions.handle_double_click)
 
         self.main_window.filter_search.textChanged.connect(self.functions.filter_table)
         self.main_window.clear_filter_btn.clicked.connect(self.functions.clear_filters)

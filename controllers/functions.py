@@ -9,6 +9,7 @@ from controllers.pdf import export_to_pdf
 from controllers.csv import export_to_csv, import_from_csv
 import controllers.ocr
 from difflib import SequenceMatcher
+from ui.show_description_dialog import show_description_popup as desc_popup
 
 class Functions:
     def __init__(self, main_window, db):
@@ -220,6 +221,11 @@ class Functions:
         filter_text = self.main_window.description_input.text().strip().lower()
         self.active_filters["description"] = None if not filter_text else filter_text
         self.apply_all_filters()
+
+    def handle_double_click(self, row, column):
+        if column ==6:  # Check if the "Description" column is clicked
+            description = self.main_window.table.item(row, column).text()
+            desc_popup(self.main_window, description)
 
     def filter_table(self):
         search_text = self.main_window.filter_search.text().strip().lower()
