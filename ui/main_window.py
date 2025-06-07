@@ -130,6 +130,16 @@ class MainWindow(QWidget):
             self.grid_filter.addWidget(labels[i], 0, i)
             self.grid_filter.addWidget(widgets[i], 1, i)
 
+        self.min_amount_spinbox.setDecimals(2)
+        self.min_amount_spinbox.setMaximum(9999999.99)
+        self.min_amount_spinbox.setMinimum(0.00)
+        self.min_amount_spinbox.setSingleStep(1.00)
+
+        self.max_amount_spinbox.setDecimals(2)
+        self.max_amount_spinbox.setMaximum(9999999.99)
+        self.max_amount_spinbox.setMinimum(0.00)
+        self.max_amount_spinbox.setSingleStep(1.00)
+
         self.filter_layout.addLayout(self.top_filter_row)
         self.filter_layout.addLayout(self.grid_filter)
 
