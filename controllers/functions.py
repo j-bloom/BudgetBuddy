@@ -4,12 +4,24 @@ from ui.add_income_dialog import AddIncomeDialog
 from ui.edit_entry_dialog import EditEntryDialog
 from ui.table_search_dialog import TableSearchDialog
 from datetime import datetime
+import os
+import sys
 import pytesseract
 from controllers.pdf import export_to_pdf
 from controllers.csv import export_to_csv, import_from_csv
 import controllers.ocr
 from difflib import SequenceMatcher
 from ui.show_description_dialog import show_description_popup as desc_popup
+
+# Helper function for using Tesseract once app is packages with pyinstaller
+def resource_path(relative_path):
+    try:
+        # When packaged with PyInstaller
+        base_path = sys._MEIPASS
+    except AttributeError:
+        # When running in development
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
 
 class Functions:
     def __init__(self, main_window, db):
@@ -25,6 +37,9 @@ class Functions:
             "max_amount": None,
             "description": None
         }
+
+        tesseract_path = resource_path(os.path.join("Tesseract-OCR", "tesseract.exe"))
+        pytesseract.pytesseract.tesseract_cmd = tesseract_path
 
     def open_add_expense_dialog(self):
         self.dialog = AddExpenseDialog(on_submit_callback=self.handle_add_expense_submit)
@@ -150,8 +165,6 @@ class Functions:
         self.db.load_table()
 
     def handle_import_screenshot(self):
-        pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'  # Update if needed
-
         file_path, _ = QFileDialog.getOpenFileName(
             self.main_window,
             "Select Image",
