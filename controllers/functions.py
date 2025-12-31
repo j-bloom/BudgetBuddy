@@ -7,6 +7,7 @@ from datetime import datetime
 import os
 import sys
 import pytesseract
+import platform
 from controllers.pdf import export_to_pdf
 from controllers.csv import export_to_csv, import_from_csv
 import controllers.ocr
@@ -15,13 +16,14 @@ from ui.show_description_dialog import show_description_popup as desc_popup
 
 # Helper function for using Tesseract once app is packages with pyinstaller
 def resource_path(relative_path):
-    try:
-        # When packaged with PyInstaller
-        base_path = sys._MEIPASS
-    except AttributeError:
-        # When running in development
-        base_path = os.path.abspath(".")
-    return os.path.join(base_path, relative_path)
+    """Get path to resource, works for dev and PyInstaller."""
+    if hasattr(sys, "_MEIPASS"):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), relative_path)
+
+tesseract_path = resource_path(os.path.join("Tesseract-OCR", "tesseract"))
+pytesseract.pytesseract.tesseract_cmd = tesseract_path
+
 
 class Functions:
     def __init__(self, main_window, db):
@@ -38,8 +40,34 @@ class Functions:
             "description": None
         }
 
-        tesseract_path = resource_path(os.path.join("Tesseract-OCR", "tesseract.exe"))
-        pytesseract.pytesseract.tesseract_cmd = tesseract_path
+        # tesseract_path = resource_path(os.path.join("Tesseract-OCR", "tesseract.exe"))
+        # pytesseract.pytesseract.tesseract_cmd = tesseract_path
+
+        self.configure_tesseract()
+
+
+    def configure_tesseract(self):
+        system = platform.system()
+
+        if system == "Windows":
+            tesseract_path = resource_path(
+                os.path.join("Tesseract-OCR", "tesseract.exe")
+            )
+            pytesseract.pytesseract.tesseract_cmd = tesseract_path
+
+        elif system == "Darwin":  # macOS
+            if os.path.exists("/opt/homebrew/bin/tesseract"):
+                pytesseract.pytesseract.tesseract_cmd = "/opt/homebrew/bin/tesseract"
+            elif os.path.exists("/usr/local/bin/tesseract"):
+                pytesseract.pytesseract.tesseract_cmd = "/usr/local/bin/tesseract"
+            else:
+                QMessageBox.critical(
+                    None,
+                    "Tesseract Not Found",
+                    "Tesseract OCR is required.\n\nInstall it using:\nbrew install tesseract"
+                )
+                sys.exit(1)
+
 
     def open_add_expense_dialog(self):
         self.dialog = AddExpenseDialog(on_submit_callback=self.handle_add_expense_submit)

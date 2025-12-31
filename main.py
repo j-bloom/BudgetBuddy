@@ -13,7 +13,7 @@ class BudgetBuddyApp(QWidget):
         # Main App Objects and Settings
         super().__init__()
         self.setWindowTitle("Budget Tracker 2.0")
-        self.resize(550, 500)
+        self.resize(900, 650)
 
         self.main_window = MainWindow()
         self.db = Database(self.main_window)
@@ -64,7 +64,7 @@ class BudgetBuddyApp(QWidget):
         self.db.load_table()
 
 # Show/Run our App
-if __name__ in "__main__":
+if __name__ == "__main__":
     app = QApplication([])
     main = BudgetBuddyApp()
     main.show()
